@@ -1,0 +1,113 @@
+.tipsy { font-size: 16px; position: absolute; padding: 5px; z-index: 100000; }
+  .tipsy-inner { background-color: #bbb; color: #000; max-width: 500px; padding: 5px 8px 4px 8px; text-align: center; }
+
+  /* Rounded corners */
+  .tipsy-inner { border-radius: 3px; -moz-border-radius: 3px; -webkit-border-radius: 3px; }
+  
+  /* Uncomment for shadow */
+  /*.tipsy-inner { box-shadow: 0 0 5px #000000; -webkit-box-shadow: 0 0 5px #000000; -moz-box-shadow: 0 0 5px #000000; }*/
+  
+  .tipsy-arrow { position: absolute; width: 0; height: 0; line-height: 0; border: 5px dashed #eee; }
+  
+  /* Rules to colour arrows */
+  .tipsy-arrow-n { border-bottom-color: #aab; }
+  .tipsy-arrow-s { border-top-color: #aab; }
+  .tipsy-arrow-e { border-left-color: #aab; }
+  .tipsy-arrow-w { border-right-color: #aab; }
+  
+	.tipsy-n .tipsy-arrow { top: 0px; left: 50%; margin-left: -5px; border-bottom-style: solid; border-top: none; border-left-color: transparent; border-right-color: transparent; }
+    .tipsy-nw .tipsy-arrow { top: 0; left: 10px; border-bottom-style: solid; border-top: none; border-left-color: transparent; border-right-color: transparent;}
+    .tipsy-ne .tipsy-arrow { top: 0; right: 10px; border-bottom-style: solid; border-top: none;  border-left-color: transparent; border-right-color: transparent;}
+  .tipsy-s .tipsy-arrow { bottom: 0; left: 50%; margin-left: -5px; border-top-style: solid; border-bottom: none;  border-left-color: transparent; border-right-color: transparent; }
+    .tipsy-sw .tipsy-arrow { bottom: 0; left: 10px; border-top-style: solid; border-bottom: none;  border-left-color: transparent; border-right-color: transparent; }
+    .tipsy-se .tipsy-arrow { bottom: 0; right: 10px; border-top-style: solid; border-bottom: none; border-left-color: transparent; border-right-color: transparent; }
+  .tipsy-e .tipsy-arrow { right: 0; top: 50%; margin-top: -5px; border-left-style: solid; border-right: none; border-top-color: transparent; border-bottom-color: transparent; }
+  .tipsy-w .tipsy-arrow { left: 0; top: 50%; margin-top: -5px; border-right-style: solid; border-left: none; border-top-color: transparent; border-bottom-color: transparent; }
+  
+  div.charts{
+  	 width: 100%;  		height: 100%;
+  	 min-height:100px; 	min-width:300px;
+  	 color:#247;
+  }
+    
+  div#navigationID { position:absolute; top:0; right:0; color:#FFF; font-size:xx-small; opacity:.9; height:100%; min-height:100%; min-width:100%; z-index:1;}
+  div#navigationID:hover { opacity:.9; }
+  div#navigationID a { font-size:xx-small;  }
+  
+  .node {
+ 	fill: #000;
+  	stroke: #cde;
+  }
+
+  .node text{
+    font: normal 8pt Arial;  	
+  	stroke: #000;
+  }
+  
+  .link {
+  	stroke: #222;
+  	stroke-width: 2.14px;
+  }
+  
+  .link text{
+    font-family: courier;
+    font-size:12px;
+  	stroke: #000;
+  	stroke-width: 0.95px;  	
+  }
+    
+  .link line{  	
+  }
+
+.d3-tip {
+  fill: #c00;
+  font-weight: bold;
+}
+
+ .d3-tip text {
+  fill: #fff;
+  font-size: 12px;
+  stroke: none;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.icon-plus{
+  background-image: url(../icons/plus.png) ;
+  background-size: 100%;
+}
+
+.icon-save{
+  background-image: url(../icons/save.png);
+  background-size: 100%;
+}
+
+.icon-tools{
+  background-image: url(../icons/tool.png);
+  background-size: 100%;
+}
+
+.icon-help{
+  background-image: url(../icons/help.png);
+  background-size: 100%;
+}
+
+.icon-barchart{
+  background-image: url(../icons/bar_chart.png);
+  background-size: 100%;
+}
+
+.icon-csvExport{
+  background-image: url(../icons/export.png);
+  background-size: 100%;
+}
+
+.icon-csvImport{
+  background-image: url(../icons/import.png);
+  background-size: 100%;
+}
+
+.icon-expert{
+  background-image: url(../icons/expert.png);
+  background-size: 100%;
+}
+

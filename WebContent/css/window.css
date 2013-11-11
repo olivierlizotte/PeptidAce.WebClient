@@ -1,0 +1,174 @@
+/*Open window function caller */
+div#openConsole {
+	top: 0px;
+  	position: absolute; 
+  	width: 99%;
+  	font-family: "aeroFont";
+  	font-size: 10px; 
+  	color: #000; 
+    z-index:19999;
+}
+
+/*Hide window function caller */
+div#hideConsole{
+  	position: absolute;
+  	bottom: 0;
+  	width: 99%;
+  	font-family: "aeroFont";
+  	font-size: 10px; 
+    text-align: center; 
+  	color: #000; 
+}
+
+#console-div {
+    color: #fff;
+	opacity:0.85;
+}
+
+
+#winB-div {
+    position:absolute;    
+    top:10px;
+	right:10px;
+	width:100%;
+    z-index:20000;
+}
+#winB-div .win {
+    border-radius: 8px;
+    -moz-border-radius: 8px;
+    background: #F6F6F6;
+    margin-top: 2px;
+    color: #555;
+}
+
+
+#console-msg-div {
+    position:absolute;
+    top:0px;
+    width:90%;
+    z-index:20000;
+}
+#console-msg-div .msg {
+    border-radius: 8px;
+    -moz-border-radius: 8px;
+    background: #000000;
+    background: rgba(0, 0, 0, 0.72);
+    border: 2px solid #ccc;
+    margin-top: 2px;
+    color: #555;
+    -webkit-box-shadow: -5px 6px 15px 0px #777;
+    box-shadow: -5px 6px 15px 0px #777;
+}
+#console-msg-div .msg h3 {
+    margin: 0 0 8px;
+    font-weight: bold;
+    font-size: 15px;
+}
+#console-msg-div .msg p {
+    margin: 0;
+}
+
+#msg-div {
+    position:absolute;
+    top:0px;
+    width:90%;
+    z-index:20000;
+}
+#msg-div .msg {
+    border-radius: 8px;
+    -moz-border-radius: 8px;
+    background: #000000;
+    background: rgba(0, 0, 0, 0.72);
+    border: 2px solid #ccc;
+    margin-top: 2px;
+    color: #eee;
+    -webkit-box-shadow: -5px 6px 15px 0px #777;
+    box-shadow: -5px 6px 15px 0px #777;
+}
+#msg-div .msg h3 {
+    margin: 0 0 8px;
+    font-weight: bold;
+    font-size: 15px;
+}
+#msg-div .msg p {
+    margin: 0;
+}
+
+span:hover {
+	cursor:pointer;
+}
+
+
+/*MESSAGE BOX*/
+#msg-divB {
+    position:absolute;
+    top:20px;
+    z-index:20000;
+}
+#msg-divB .msg {
+    margin-top: 8px;
+    padding: 10px 15px;
+    color: #000;
+}
+#msg-divB .msg h3 {
+    margin: 0 0 8px;
+    font-weight: bold;
+    font-size: 15px;
+}
+#msg-divB .msg p {
+    margin: 0;
+}
+
+
+/*Window BOX*/
+#msg-divC {
+    position:absolute;
+    top:20px;
+    z-index:20000;
+}
+#msg-divC .msg {
+    margin-top: 8px;
+    padding: 10px 15px;
+    color: #000;
+}
+#spectrum
+{
+    border-radius: 8px;
+    -moz-border-radius: 8px;
+    background: #FFFFFF;
+    -webkit-box-shadow: -5px 6px 15px 0px #777;
+    box-shadow: -5px 6px 15px 0px #777;
+}
+#msg-divC .msg h3 {
+    margin: 0 0 8px;
+    font-weight: bold;
+    font-size: 15px;
+}
+#msg-divC .msg p {
+    margin: 0;
+}
+
+/*Hide window function caller */
+div#hideWindow {
+  	position: relative; 
+  	bottom: 0;  	
+  	width: 100%;
+  	font-family: "aeroFont";
+  	font-size: 10px; 
+    text-align: center; 
+  	color: #000; 
+}
+
+#code_hierarchy
+{
+    position:relative;
+    width:600px;
+    margin:0 auto;
+}
+
+#code_hierarchy_legend
+{
+    height:100px;
+    font-size:1.4em;
+    text-align:center;
+}

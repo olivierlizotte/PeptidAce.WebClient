@@ -1,0 +1,103 @@
+
+/*Quotes*/
+blockquote {
+    font-style: italic;
+}
+blockquote small { 
+	align: right;
+	position: relative;
+    margin: 17px;	
+}
+blockquote p { 
+	margin-top:5px;
+	margin-bottom:5px;
+	margin-right:30px;
+	margin-left:17px;
+	position: relative;
+}
+
+blockquote p:before {
+    font-style: bold;
+	content: '"';
+}
+
+blockquote p:after {
+	font-style: bold;
+	content: '"';
+}
+
+div#gear
+{
+  	z-index: 2;
+}
+
+/*Header*/
+div#header{
+	margin-left: 6px;
+    margin-top: 6px;
+}
+
+/*Background gradient for the body, done using Microsoft CSS Background Maker */ 
+/*http://ie.microsoft.com/testdrive/graphics/cssgradientbackgroundmaker/default.html*/
+body { /* Note: This gradient may render differently in browsers that don't support the unprefixed gradient syntax */
+    height: 100%;
+    margin: 0;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+
+/* Opera */ 
+background-image: -o-linear-gradient(bottom right, #FFFFFF 0%, #CEE3EF 50%);
+
+/* Webkit (Safari/Chrome 10) */ 
+background-image: -webkit-gradient(linear, right bottom, left top, color-stop(0, #FFFFFF), color-stop(0.5, #CEE3EF));
+
+/* Webkit (Chrome 11+) */ 
+background-image: -webkit-linear-gradient(bottom right, #FFFFFF 0%, #CEE3EF 50%);
+
+/* W3C Markup, IE10 Release Preview */ 
+background-image: linear-gradient(to top left, #FFFFFF 0%, #CEE3EF 50%);
+
+/* Mozilla Firefox */ 
+background-image: -moz-linear-gradient(bottom right, #FFFFFF 0%, #CEE3EF 50%);
+
+}
+
+
+/*Logo*/
+div#footer {
+  	position: absolute; 
+  	bottom: 0;  	
+  	width: 100%;
+  	font-family: "aeroFont";
+  	font-size: 10px; 
+    text-align: center; 
+  	opacity: .75; 
+  	color: #FFF; 
+  	fill: #000;
+}
+
+div#green {
+  	position: absolute; 
+  	bottom: 0;
+	right: 0;
+  	width: 100%;
+}
+
+/*Div displayed below graph, to display site content*/
+div#content {
+  	position: absolute; 
+  	top: 0; 
+  	right: 0;  	 
+  	color: #FFF;
+  	background: #A6A6A6; 
+  	font-size: xx-small; 
+  	opacity: .9; 
+  	height: 70%; 
+  	width:90%;
+  	min-height: 70%; 
+  	min-width: 90%; 
+  	z-index: 0;
+}
+
+
+

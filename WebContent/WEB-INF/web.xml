@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:web="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+  <security-role>
+    <description>Administrator</description>
+    <role-name>editor</role-name>
+  </security-role>
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>applets</web-resource-name>
+      <url-pattern>/admin2/*</url-pattern>
+      <url-pattern>/applets/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>editor</role-name>
+    </auth-constraint>
+  </security-constraint>
+  <login-config>
+    <auth-method>BASIC</auth-method>
+    <realm-name>Admin Login</realm-name>
+  </login-config>
+</web-app>
