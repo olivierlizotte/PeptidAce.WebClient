@@ -21,7 +21,7 @@ jQuery(document).ready(function ($) {
             case "trinity":
                 term.push(function (command, term) {
                     var data = { Type: "Command", Command: command };
-                    conn.send(JSON.stringify(data));                    
+                    trinityConn.send(JSON.stringify(data));                    
                 }, {
                     prompt: 'Trinity> ',
                     name: 'trinity',

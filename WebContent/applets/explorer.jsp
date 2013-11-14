@@ -702,13 +702,6 @@ function OnNodeClick(node)
 	}
 }
 
-Ext.onReady(function() {
-	viewport = CreateViewport();
-	
-	CreateGraph(dataObject, "navigationID", OnNodeClick);
-});
-
-
 </script>
 
 
@@ -919,59 +912,79 @@ Ext.onReady(function() {
 
 <div id="openConsole"><span onclick="OpenConsole(); return false;" style="float:right;"> -v- Console -v- &nbsp;&nbsp;&nbsp;&nbsp;</span></div>
 
-<script type='text/javascript'>
-    OpenConsole();
+<script type='text/javascript'>    
 
-    var stepCounter = 0;
-    function openConnection() {
+    var trinityConn = {};
+
+    function retryTrinityConnection() {
+        if (trinityConn.readyState === undefined || trinityConn.readyState > 1){
+        	openTrinityConnection();        
+            setInterval(retryTrinityConnection, 10000);
+        }
+    }
+
+    function logUser(theUser){
+        var dataToSend = { Type: "Register", Name: theUser }; //Register
+        trinityConn.send(JSON.stringify(dataToSend));        
+    }
+    
+    function openTrinityConnection() {
         // uses global 'conn' object
-        if (conn.readyState === undefined || conn.readyState > 1) {
-
-            conn = new WebSocket('ws://localhost:81');
-
-            conn.onopen = function () {
-
-                var data = { Type: "Register", Name: "admin" }; //Register
-                conn.send(JSON.stringify(data));
+        if (trinityConn.readyState === undefined || trinityConn.readyState > 1) {
+        	trinityConn = new WebSocket('ws://localhost:81');
+        	
+        	trinityConn.onopen = function () {
+//        		alert("Connected");
+				logUser("admin");
             };
 
-            conn.onmessage = function (event) {
-                var response = JSON.parse(event.data);
-                if (response.Type) {
-                    if (response.Type == 'Data' && response.Data)
-                        DisplayData(response.Data);
+            trinityConn.onmessage = function (event) {
+                var responseData = JSON.parse(event.data);
+                if (responseData.Type) {
+                    if (responseData.Type == 'Data' && responseData.Data)
+                        DisplayData(responseData.Data);
 
-                    if (response.Message)
-                        Terminal.echo(response.Message);
+                    if (responseData.Message)
+                        Terminal.echo(responseData.Message);
                 }
             };
 
-            conn.onerror = function (event) {
-                var response;
+            trinityConn.onerror = function (event) {
+                var responseData;
                 if(event.data)
-                    response = JSON.parse(event.data);
-                if (response && response.Message)
-                    Terminal.echo(response.Message);
+                	responseData = JSON.parse(event.data);
+                if (responseData && responseData.Message)
+                    Terminal.echo(responseData.Message);
                 else
                     Terminal.echo("Web Socket Error");
             };
 
-            conn.onclose = function (event) {
-                var response;
+            trinityConn.onclose = function (event) {
+                var responseData;
                 if (event.data)
-                    response = JSON.parse(event.data);
-                if (response && response.Message)
-                    Terminal.echo(response.Message);
+                	responseData = JSON.parse(event.data);
+                if (responseData && responseData.Message)
+                    Terminal.echo(responseData.Message);
                 else
                     Terminal.echo("Web Socket Closed");
+                userLoged = 0;
+                setInterval(retryTrinityConnection, 3000);
             };
         }
     }
 
-    $(document).ready(function () {
-        conn = {}, window.WebSocket = window.WebSocket || window.MozWebSocket;
+	OpenConsole();
+	
+    Ext.onReady(function() {
+    	viewport = CreateViewport();
+    	
+    	CreateGraph(dataObject, "navigationID", OnNodeClick);    	
+    });
+    
+    $(document).ready(function () {    	
+    	window.WebSocket = window.WebSocket || window.MozWebSocket;
 
-        openConnection();
+    	retryTrinityConnection();
     });//*/
 </script>
 </body>
