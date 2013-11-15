@@ -931,11 +931,11 @@ function OnNodeClick(node)
     function openTrinityConnection() {
         // uses global 'conn' object
         if (trinityConn.readyState === undefined || trinityConn.readyState > 1) {
-        	trinityConn = new WebSocket('ws://localhost:81');
+        	trinityConn = new WebSocket('ws://localhost:8181');
         	
         	trinityConn.onopen = function () {
 //        		alert("Connected");
-				logUser("admin");
+				//logUser("admin");
             };
 
             trinityConn.onmessage = function (event) {
@@ -944,6 +944,9 @@ function OnNodeClick(node)
                     if (responseData.Type == 'Data' && responseData.Data)
                         DisplayData(responseData.Data);
 
+                    if(responseData.Type == 'Register')
+                    	logUser("admin");
+                	
                     if (responseData.Message)
                         Terminal.echo(responseData.Message);
                 }
