@@ -39,11 +39,11 @@ public class XmlToDb extends DefaultHandler
 	static int MaxTx = 10000;
 	int doTx = 0;;
 	
-	public XmlToDb(String userName) 
+	public XmlToDb(String userName, String dbName) 
 	{
 		super();
 		
-		graphDb = DefaultTemplate.graphDb();
+		graphDb = DefaultTemplate.graphDb(dbName);
 		
 		//indexing the nodes is essential in order to be able to use the following request type :
 		// "start n=node:nodes(StringID="RAW1") return n"
@@ -258,10 +258,10 @@ public class XmlToDb extends DefaultHandler
 	}
 		
 	//Read file and feed DB 
-	public static void RUN(String file, String nickName) throws Exception 
+	public static void RUN(String file, String nickName, String dbName) throws Exception 
 	{
 		XMLReader xr = XMLReaderFactory.createXMLReader();
-		XmlToDb handler = new XmlToDb(nickName);
+		XmlToDb handler = new XmlToDb(nickName, dbName);
 		xr.setContentHandler(handler);
 		xr.setErrorHandler(handler);
 		

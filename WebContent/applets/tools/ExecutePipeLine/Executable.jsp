@@ -11,8 +11,6 @@
 <%@ page import ="org.neo4j.graphdb.DynamicRelationshipType" %>
 <%@ page import ="org.neo4j.graphdb.Transaction" %>
 <%@ page import ="org.neo4j.graphdb.index.Index" %>
-<%@ page import ="org.neo4j.kernel.AbstractGraphDatabase" %>
-<%@ page import ="org.neo4j.kernel.EmbeddedGraphDatabase" %>
 <%@page import="org.neo4j.cypher.javacompat.*"%>
 <%@page import="java.util.*" %>
 <%@ page import="java.util.List"%>
@@ -26,14 +24,13 @@
 String nodeID = request.getParameter("id").toString();
 String startNodeID = request.getParameter("startNodeID").toString();
 
-EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
+String dbName = session.getAttribute("database").toString();
+GraphDatabaseService graphDb = DefaultTemplate.graphDb(dbName);
 
 
-try{
-	Transaction tx = graphDb.beginTx();
+try(Transaction tx = graphDb.beginTx()){
 	
 	tx.success();
-	tx.finish();
 }
 catch(Exception e)
 {

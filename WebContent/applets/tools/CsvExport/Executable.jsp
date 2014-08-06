@@ -14,10 +14,10 @@ try
     String nodeType = request.getParameter("nodeType").toString();
     String nodeProperties = request.getParameter("nodeProperties").toString();
 
-    EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
-    Node currentNode = graphDb.getNodeById(Long.valueOf(request.getParameter("id"))); 
+    String dbName = session.getAttribute("database").toString();
+    Node currentNode = DefaultTemplate.graphDb(dbName).getNodeById(Long.valueOf(request.getParameter("id"))); 
 
-	Grid.GetListAsCsv(out, nodeProperties, nodeID, nodeType);
+	Grid.GetListAsCsv(out, nodeProperties, nodeID, nodeType, dbName);
 }
 catch(Exception e) // file IO errors
 {

@@ -11,8 +11,6 @@
 <%@ page import ="org.neo4j.graphdb.DynamicRelationshipType" %>
 <%@ page import ="org.neo4j.graphdb.Transaction" %>
 <%@ page import ="org.neo4j.graphdb.index.Index" %>
-<%@ page import ="org.neo4j.kernel.AbstractGraphDatabase" %>
-<%@ page import ="org.neo4j.kernel.EmbeddedGraphDatabase" %>
 <%@page import="org.neo4j.cypher.javacompat.*"%>
 <%@page import="java.util.*" %>
 <%@ page import="java.util.List"%>
@@ -26,10 +24,11 @@
 String nodeID = request.getParameter("id").toString();
 String pipelineName = request.getParameter("pipelineName").toString();
 String description = request.getParameter("description").toString();
+String dbName = session.getAttribute("database").toString();
 
 
 
-EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
+GraphDatabaseService graphDb = DefaultTemplate.graphDb(dbName);
 Node parsingNode;
 //String cypherQuery ="start n=node("+nodeID+") match n-->p where has(p.Sequence) return p.Sequence";
 
@@ -37,12 +36,12 @@ Node parsingNode;
 
 
 
-try{
-	Transaction tx = graphDb.beginTx();
+try(Transaction tx = graphDb.beginTx())
+{
 	parsingNode = graphDb.getNodeById(Long.valueOf(nodeID));
 	ArrayList<String> queries = new ArrayList<String>();
 	// create the node storing the pipeline information
-	Index<Node> index = DefaultTemplate.graphDb().index().forNodes("tempNodes");
+	Index<Node> index = graphDb.index().forNodes("tempNodes");
 	Node pipeLineNode = graphDb.createNode(); 
 	pipeLineNode.setProperty("type", "Pipeline");
 	pipeLineNode.setProperty("Name", pipelineName);
@@ -65,7 +64,6 @@ try{
 	userNode.createRelationshipTo(pipeLineNode, DynamicRelationshipType.withName("DataAnalysis"));
 	long userNodeID = userNode.getId();
 	tx.success();
-	tx.finish();
 	out.print(userNodeID);
 }
 catch(Exception e)

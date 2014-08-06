@@ -12,19 +12,19 @@
 <%@ page import="org.neo4j.graphdb.RelationshipType" %>
 <%@ page import="org.neo4j.graphdb.Transaction" %>
 <%@ page import="org.neo4j.graphdb.index.Index" %>
-<%@ page import="org.neo4j.kernel.AbstractGraphDatabase" %>
-<%@ page import="org.neo4j.kernel.EmbeddedGraphDatabase" %>
 <%@ page import="java.util.*" %>
 <%@ page import="java.io.*" %>
 <%@ page import="graphDB.explore.*" %>
 
 <%
 
-Transaction tx = DefaultTemplate.graphDb().beginTx();
-final RelationshipType relType = DynamicRelationshipType.withName( "Comment" );
-Node theUser = DefaultTemplate.graphDb().getNodeById(1l);
-for(Relationship otherRelation : theUser.getRelationships(relType))
-	otherRelation.delete();
-tx.success();
-tx.finish();
+String dbName = session.getAttribute("database").toString();
+try(Transaction tx = DefaultTemplate.graphDb(dbName).beginTx())
+{
+	final RelationshipType relType = DynamicRelationshipType.withName( "Comment" );
+	Node theUser = DefaultTemplate.graphDb(dbName).getNodeById(1l);
+	for(Relationship otherRelation : theUser.getRelationships(relType))
+		otherRelation.delete();
+	tx.success();
+}
 %>

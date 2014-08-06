@@ -1,4 +1,4 @@
-<%@page import="org.neo4j.cypher.internal.commands.IsNull"%>
+<%@page import="org.neo4j.graphdb.factory.GraphDatabaseFactory"%>
 <%@page import="org.neo4j.graphdb.DynamicRelationshipType"%>
 <%@page import="scala.util.parsing.json.JSONFormat"%>
 <%@ page import="graphDB.explore.*" %>
@@ -11,8 +11,6 @@
 <%@ page import ="org.neo4j.graphdb.RelationshipType" %>
 <%@ page import ="org.neo4j.graphdb.Transaction" %>
 <%@ page import ="org.neo4j.graphdb.index.Index" %>
-<%@ page import ="org.neo4j.kernel.AbstractGraphDatabase" %>
-<%@ page import ="org.neo4j.kernel.EmbeddedGraphDatabase" %>
 <%@page import="org.neo4j.cypher.javacompat.*"%>
 <%@page import="java.util.*" %>
 <%@ page import="java.util.*"%>
@@ -24,7 +22,9 @@ csvContent = csvContent.trim();
 String[] csvLines = csvContent.split("\n");
 System.out.println(csvContent);
 
-EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
+String dbName = session.getAttribute("database").toString();
+//GraphDatabaseFactory graphDb = new GraphDatabaseFactory(); 
+GraphDatabaseService graphDb = DefaultTemplate.graphDb(dbName);
 
 // first read the header
 //attributeName is the attribute to consider to identify one node only and change its value
@@ -48,24 +48,25 @@ if(attributeNameToIdentify.equals("Node ID"))
 	try
 	{
 		int nbNodes = 0;
-		Transaction tx = graphDb.beginTx(); 	
-		for (int l=1 ; l < csvLines.length ; l++)
-		{	
-			String[] splits = csvLines[l].split(","); 
-			long nodeid = Long.parseLong(splits[0]);
-			Node theNode = graphDb.getNodeById(nodeid);
-			for (int i = 1 ; i < splits.length ; i++)
-			{
-				String value = splits[i].trim();
-				if (NodeHelper.isNumeric(value))
-					theNode.setProperty(attributeNameToUpdate.get(i-1), Double.valueOf(value));
-				else
-					theNode.setProperty(attributeNameToUpdate.get(i-1), value);
-				nbNodes++;
-			}
-		}	
-		tx.success();
-		tx.finish();
+		try(Transaction tx = graphDb.beginTx())
+		{
+			for (int l=1 ; l < csvLines.length ; l++)
+			{	
+				String[] splits = csvLines[l].split(","); 
+				long nodeid = Long.parseLong(splits[0]);
+				Node theNode = graphDb.getNodeById(nodeid);
+				for (int i = 1 ; i < splits.length ; i++)
+				{
+					String value = splits[i].trim();
+					if (NodeHelper.isNumeric(value))
+						theNode.setProperty(attributeNameToUpdate.get(i-1), Double.valueOf(value));
+					else
+						theNode.setProperty(attributeNameToUpdate.get(i-1), value);
+					nbNodes++;
+				}
+			}	
+			tx.success();
+		}
 
 		System.out.println("Saved " + nbNodes + " Nodes.");
 	}
@@ -96,7 +97,7 @@ else
 	
 	try
 	{	
-		Transaction tx = graphDb.beginTx(); 	
+		try(Transaction tx = graphDb.beginTx()) 	
 		{
 			Iterable<Relationship> allRels = currentNode.getRelationships(Direction.OUTGOING, DynamicRelationshipType.withName("Listed"));
 			// if the csv contains information about bindingscore, put it in the "Sequence" Node.
@@ -151,9 +152,8 @@ else
 					}
 				}
 			}
+			tx.success();
 		}
-		tx.success();
-		tx.finish();
 	}
 	catch(Exception e)
 	{

@@ -10,8 +10,6 @@
 <%@ page import ="org.neo4j.graphdb.RelationshipType" %>
 <%@ page import ="org.neo4j.graphdb.Transaction" %>
 <%@ page import ="org.neo4j.graphdb.index.Index" %>
-<%@ page import ="org.neo4j.kernel.AbstractGraphDatabase" %>
-<%@ page import ="org.neo4j.kernel.EmbeddedGraphDatabase" %>
 <%@page import="org.neo4j.cypher.javacompat.*"%>
 <%@page import="java.util.*" %>
 <%@ page import="java.util.List"%>
@@ -31,7 +29,8 @@ var NB_FILTERS = 1;
 var MAX_FILTERS = 5;
 <%
 long currentID = Long.valueOf(request.getParameter("id"));
-EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
+String dbName = session.getAttribute("database").toString();
+GraphDatabaseService graphDb = DefaultTemplate.graphDb(dbName);
 HashMap<String, HashMap<String, Integer>> typesAndPropertiesRelated = NodeHelper.getRelatedNodeTypesAndProperties( graphDb.getNodeById(currentID));
 String nodeTypesOptions = "";
 String properties;
@@ -149,6 +148,7 @@ function removeFilter(){
 	}
 }
 
+changeProperties();
 	</script>
 	</head>
 	<body>
@@ -169,9 +169,9 @@ function removeFilter(){
 		<select id="nodeProperty1" >
 		</select>
 		<select id="comparator1">
-		<option value="="> = </option>
-		<option value="<"> < </option>
-		<option value=">"> > </option>
+		<option value="="> equal </option>
+		<option value="<"> smaller </option>
+		<option value=">"> bigger </option>
 		</select>	
 		<input type="text" id="value1" value="a value" size=2/>
 		</fieldset>
@@ -184,7 +184,6 @@ function removeFilter(){
 	
 	<div id="wait"></div>
 	<br>
-	<script>changeProperties(); </script>
-	<div id="error-message" style="color:'red'"></div>
+	<div id="error-message"></div>
 	</body>
 </html>

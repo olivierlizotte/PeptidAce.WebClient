@@ -16,8 +16,8 @@ public class DefaultNode
 	}
 
 
-	public DefaultNode(String nodeID) {
-		theNode = DefaultTemplate.graphDb().getNodeById(Long.valueOf(nodeID));
+	public DefaultNode(String nodeID, String dataName) {
+		theNode = DefaultTemplate.graphDb(dataName).getNodeById(Long.valueOf(nodeID));
 	}
 
 	public String getCommentsVariable(String varName) {

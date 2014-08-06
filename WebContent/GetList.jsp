@@ -14,8 +14,6 @@
 <%@ page import="org.neo4j.graphdb.RelationshipType" %>
 <%@ page import="org.neo4j.graphdb.Transaction" %>
 <%@ page import="org.neo4j.graphdb.index.Index" %>
-<%@ page import="org.neo4j.kernel.AbstractGraphDatabase" %>
-<%@ page import="org.neo4j.kernel.EmbeddedGraphDatabase" %>
 <%@ page import="java.util.*" %>
 <%@ page import="java.io.*" %>
 <%@ page import="graphDB.explore.*" %>
@@ -25,6 +23,7 @@ if(session.getAttribute("user") != null)
 {	
 	//Retrieve the list of nodes (in json) following a set of params
 	
+	String dbName 	  = session.getAttribute("database").toString();
 	String sort 	  = request.getParameter("sort");
 	String nodeId     = request.getParameter("id");
 	String nodeType   = request.getParameter("type");
@@ -32,6 +31,15 @@ if(session.getAttribute("user") != null)
 	int iStart        = Integer.parseInt(request.getParameter("start"));
 	int iLimit	      = Integer.parseInt(request.getParameter("limit"));
 	int iPage		  = Integer.parseInt(request.getParameter("page"));
-	Grid.GetList(out, iStart, iLimit, sort, nodeId, nodeType, filter);
+
+	try{
+		Transaction tr = DefaultTemplate.graphDb(dbName).beginTx();
+		Grid.GetList(out, iStart, iLimit, sort, nodeId, nodeType, filter, dbName);
+		tr.success();
+	}
+	catch(Exception e)
+	{
+		e.printStackTrace();
+	}			
 }
 %>

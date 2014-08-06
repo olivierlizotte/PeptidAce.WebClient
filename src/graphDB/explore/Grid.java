@@ -17,7 +17,7 @@ import org.neo4j.shell.util.json.*;
 
 public class Grid 
 {
-	private static List<Pair<Node, Relationship>> GetValues(String sort, String nodeID, String nodeType, String filter)
+	private static List<Pair<Node, Relationship>> GetValues(String sort, String nodeID, String nodeType, String filter, String dbName)
 	{
 		List<Pair<Node, Relationship>> nodes = new LinkedList<Pair<Node, Relationship>>();
 		try 
@@ -50,7 +50,7 @@ public class Grid
 			String direction= obj.getString("direction");
 			final boolean dir = ("ASC".equals(direction) ? true : false);
 					
-			Node head = DefaultTemplate.graphDb().getNodeById(Long.parseLong(nodeID)); 
+			Node head = DefaultTemplate.graphDb(dbName).getNodeById(Long.parseLong(nodeID)); 
 			
 			//Cycle through the list of relations to find them 
 			for(Relationship relation : head.getRelationships())
@@ -133,14 +133,14 @@ public class Grid
 		return nodes;
 	}
 
-	public static boolean GetList(JspWriter out, int start, int limit, String sort, String nodeID, String nodeType, String filter)
+	public static boolean GetList(JspWriter out, int start, int limit, String sort, String nodeID, String nodeType, String filter, String dbName)
 	{		
 		try
 		{
 			out.println("{root:[");
 			long nbElem = 0;
 			long nbPrinted = 0;
-			List<Pair<Node, Relationship>> nodes = GetValues(sort, nodeID, nodeType, filter);
+			List<Pair<Node, Relationship>> nodes = GetValues(sort, nodeID, nodeType, filter, dbName);
 			for(Pair<Node, Relationship> aPair : nodes)
 			{
 				nbElem++;
@@ -184,12 +184,12 @@ public class Grid
 		return false;
 	}
 	
-	public static boolean GetListAsCsv(JspWriter out, String sort, String nodeID, String nodeType)
+	public static boolean GetListAsCsv(JspWriter out, String sort, String nodeID, String nodeType, String dbName)
 	{		
 		try 
 		{
 			//Get list of attributes
-			Node head = DefaultTemplate.graphDb().getNodeById(Long.parseLong(nodeID));
+			Node head = DefaultTemplate.graphDb(dbName).getNodeById(Long.parseLong(nodeID));
 			List<String> attribs = DefaultTemplate.sortAttributes(NodeHelper.computeListOfAttributes( head ).get(nodeType).keySet());
 			
 			//Print title line
@@ -198,7 +198,7 @@ public class Grid
 			out.println();
 				
 			//Get all the nodes and relations
-			List<Pair<Node, Relationship>> nodes = GetValues(sort, nodeID, nodeType, "");
+			List<Pair<Node, Relationship>> nodes = GetValues(sort, nodeID, nodeType, "", dbName);
 			
 			for(Pair<Node, Relationship> aPair : nodes)
 			{

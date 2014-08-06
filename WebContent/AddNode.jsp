@@ -4,24 +4,24 @@ if(session.getAttribute("user") != null)
 	//This jsp will add a comment and send back the new list of comments as a result
 	String nodeID    = request.getParameter("id");
 	String nodeType  = request.getParameter("type");
-    
-	EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
+	String dbName = session.getAttribute("database").toString();	
+	GraphDatabaseService graphDb = DefaultTemplate.graphDb(dbName);
 	
 	try
 	{				
-		
-		Node theNode = graphDb.getNodeById(Long.valueOf(nodeID));				
-		Transaction tx = graphDb.beginTx();
-
-		Node newNode = graphDb.createNode();
-		newNode.setProperty("type", nodeType);
-		
-		RelationshipType newNodeRel = DynamicRelationshipType.withName("Link");
-		theNode.createRelationshipTo(newNode, newNodeRel);
-		Long tempNodeID = newNode.getId();
-		tx.success();
-		tx.finish();		
-		out.println(tempNodeID);	
+					
+		try(Transaction tx = graphDb.beginTx())
+		{
+			Node theNode = graphDb.getNodeById(Long.valueOf(nodeID));	
+			Node newNode = graphDb.createNode();
+			newNode.setProperty("type", nodeType);
+			
+			RelationshipType newNodeRel = DynamicRelationshipType.withName("Link");
+			theNode.createRelationshipTo(newNode, newNodeRel);
+			Long tempNodeID = newNode.getId();
+			out.println(tempNodeID);	
+			tx.success();
+		}		
 	}
 	catch(Exception e)
 	{

@@ -31,7 +31,7 @@
                 zoomMs1: false,
                 width: 700, 	// width of the ms/ms plot
                 height: 450, 	// height of the ms/ms plot
-                massError: 0.5, // mass tolerance for labeling peaks
+                massError: 0.05, // mass tolerance for labeling peaks
                 useCookies: true,
                 extraPeakSeries:[],
                 residueSpecificNeutralLosses: false,
@@ -79,7 +79,7 @@
             msmstooltip: "lorikeet_msmstooltip",
             ion_choice: "ion_choice",
             nl_choice: "nl_choice",
-            deselectIonsLink: "deselectIonsLink",
+            hideIonsLink: "hideIonsLink",
             slider_width: "slider_width",
             slider_width_val: "slider_width_val",
             slider_height: "slider_height",
@@ -236,9 +236,9 @@
 
         setupInteractions(container);
 
-        if(options.showIonTable) {
+        //if(options.showIonTable) {
             makeIonTable(container);
-        }
+        //}
     }
 
     // trim any 0 intensity peaks from the end of the ms/ms peaks array
@@ -530,7 +530,7 @@
 	   	});
 		
 		// UPDATE
-		$(getElementSelector(container, elementIds.update)).click(function() {
+		$(getElementSelector(container, elementIds.massError)).change(function() {
 			container.data("zoomRange", null); // zoom out fully
 			setMassError(container);
 			createPlot(container, getDatasets(container));
@@ -590,12 +590,13 @@
 	    	plotAccordingToChoices(container);
 	    });
 
-        $(getElementSelector(container, elementIds.deselectIonsLink)).click(function() {
-			ionChoiceContainer.find("input:checkbox:checked").each(function() {
-				$(this).attr('checked', "");
-			});
-			
-			plotAccordingToChoices(container);
+        $(getElementSelector(container, elementIds.hideIonsLink)).click(function() {
+			var ionTableDiv = $(getElementSelector(container, elementIds.ionTableDiv));
+
+			if(ionTableDiv.is(":visible"))
+				ionTableDiv.hide("slow");
+			else
+				ionTableDiv.show("slow");
 		});
 
 	    container.find("input[name='"+getRadioName(container, "peakLabelOpt")+"']").click(function() {
@@ -1755,6 +1756,7 @@
 		
 		// alert(myTable);
 		$(getElementSelector(container, elementIds.ionTable)).remove();
+		$(getElementSelector(container, elementIds.ionTableDiv)).hide();
 		$(getElementSelector(container, elementIds.ionTableDiv)).prepend(myTable); // add as the first child
 
         if(allIonsEnabled(container)) {
@@ -2086,7 +2088,7 @@
             myTable += '<div><span style="font-weight: bold;">Internal</span><input type="checkbox" value="internal" id="internal"/> ';
             myTable += '</nobr><br />';
         }
-		myTable += '<span id="'+getElementId(container, elementIds.deselectIonsLink)+'" style="font-size:8pt;text-decoration: underline; color:sienna;cursor:pointer;">[Deselect All]</span> ';
+		myTable += '<span id="'+getElementId(container, elementIds.hideIonsLink)+'" style="font-size:8pt;text-decoration: underline; color:sienna;cursor:pointer;">[Show/Hide masses]</span> ';
 		myTable += '</div><br /> ';
 		
 		myTable += '<span style="font-weight: bold;">Neutral Loss:</span> ';
@@ -2119,9 +2121,9 @@
 		myTable += '<div style="margin-top:10px;"> ';
 		myTable += '<nobr>Mass Tol: <input id="'+getElementId(container, elementIds.massError)+'" type="text" value="'+options.massError+'" size="4"/></nobr> ';
 		myTable += '</div> ';
-		myTable += '<div style="margin-top:10px;" align="center"> ';
-		myTable += '<input id="'+getElementId(container, elementIds.update)+'" type="button" value="Update"/> ';
-		myTable += '</div> ';
+		//myTable += '<div style="margin-top:10px;" align="center"> ';
+		//myTable += '<input id="'+getElementId(container, elementIds.update)+'" type="button" value="Update"/> ';
+		//myTable += '</div> ';
 		myTable += '</td> </tr> ';
 		
 		// peak assignment method
@@ -2148,12 +2150,12 @@
 		myTable += '</td> </tr> ';
 		
 		// sliders to change plot size
-		myTable += '<tr><td class="optionCell"> ';
+		/*myTable += '<tr><td class="optionCell"> ';
 		myTable += '<div>Width: <span id="'+getElementId(container, elementIds.slider_width_val)+'">'+options.width+'</span></div> ';
 		myTable += '<div id="'+getElementId(container, elementIds.slider_width)+'" style="margin-bottom:15px;"></div> ';
 		myTable += '<div>Height: <span id="' + getElementId(container, elementIds.slider_height_val) + '">' + options.height + '</span></div> ';
 		myTable += '<div id="'+getElementId(container, elementIds.slider_height)+'"></div> ';
-		myTable += '</td> </tr> ';
+		myTable += '</td> </tr> ';*/
 
 		myTable += '</tbody>';
 		myTable += '</table>';

@@ -15,6 +15,7 @@
 			session.setAttribute("user", loginUsername);
 			session.setMaxInactiveInterval(3600);
 			session.setAttribute("userNodeID", userID);
+			session.setAttribute("database", "globalDataDb");
 		}
 		else
 		{

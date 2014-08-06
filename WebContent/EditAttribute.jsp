@@ -14,8 +14,6 @@
 <%@ page import="org.neo4j.graphdb.RelationshipType" %>
 <%@ page import="org.neo4j.graphdb.Transaction" %>
 <%@ page import="org.neo4j.graphdb.index.Index" %>
-<%@ page import="org.neo4j.kernel.AbstractGraphDatabase" %>
-<%@ page import="org.neo4j.kernel.EmbeddedGraphDatabase" %>
 <%@ page import="java.util.*" %>
 <%@ page import="java.io.*" %>
 <%@ page import="graphDB.explore.*" %>
@@ -26,6 +24,7 @@ if(session.getAttribute("user") != null)
 	
 	//This jsp will add a comment and send back the new list of comments as a result
 	String nodeID  = request.getParameter("id");
+	String dbName = session.getAttribute("database").toString();
 	//Object obj = request.getParameter("json");
 	//out.print(obj);
 	//String postParamsJSON = request.getReader().readLine();
@@ -34,28 +33,24 @@ if(session.getAttribute("user") != null)
     //JSONArray values = obj.toJSONArray(names);
     JSONObject json = new JSONObject(request.getParameter("json"));
     
-	EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
+	GraphDatabaseService graphDb = DefaultTemplate.graphDb(dbName);
 	
 	try
 	{				
+		Transaction tx = DefaultTemplate.graphDb(dbName).beginTx();
 		/*String text = json.replaceAll("\\r","<br/>");
 		text = text.replaceAll("\\n","<br/>");
 		text = text.replaceAll("\\\"", "&#34;");
 		text = text.replaceAll("\\\\", "&#92;");//*/
 		
-		Node theNode = graphDb.getNodeById(Long.valueOf(nodeID));				
-		Transaction tx = graphDb.beginTx();
-
-        JSONArray nameArray = json.names();
-        JSONArray valArray = json.toJSONArray(nameArray);
-        for(int i=0;i<valArray.length();i++)
-        {
-        	theNode.setProperty(nameArray.getString(i), valArray.get(i));
-        }       
-//		foreach(kay value pairs)
-//			theNode.setAttribute(key, value);
+		Node theNode = graphDb.getNodeById(Long.valueOf(nodeID));	
+	        JSONArray nameArray = json.names();
+	        JSONArray valArray = json.toJSONArray(nameArray);
+	        for(int i=0;i<valArray.length();i++)
+	        {
+	        	theNode.setProperty(nameArray.getString(i), valArray.get(i));
+	        }       		
 		tx.success();
-		tx.finish();		
 		out.println(request.getParameter("json"));	
 	}
 	catch(Exception e)

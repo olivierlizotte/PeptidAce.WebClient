@@ -6,11 +6,7 @@ import java.text.NumberFormat;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
-
 import javax.servlet.jsp.JspWriter;
-
-import org.neo4j.cypher.javacompat.ExecutionEngine;
-import org.neo4j.cypher.javacompat.ExecutionResult;
 import org.neo4j.graphdb.*;
 
 
@@ -320,7 +316,7 @@ public class NodeHelper
 			e.printStackTrace();
 		}
 	}
-	
+	/*
 	public static int CountNodes(Node root, RelationshipType relType)
 	{
 		String query = "START a=node(" + root.getId() + ") MATCH a-[:" + relType.name() + "]-b RETURN COUNT(*)";
@@ -336,7 +332,7 @@ public class NodeHelper
 		    }
 		}
 		return 0;
-	}
+	}//*/
 	
 	public static HashMap<String, HashMap<String, Integer>> getRelatedNodeTypesAndProperties(Node n){
 		

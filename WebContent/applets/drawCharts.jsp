@@ -10,8 +10,6 @@
 <%@ page import ="org.neo4j.graphdb.DynamicRelationshipType" %>
 <%@ page import ="org.neo4j.graphdb.Transaction" %>
 <%@ page import ="org.neo4j.graphdb.index.Index" %>
-<%@ page import ="org.neo4j.kernel.AbstractGraphDatabase" %>
-<%@ page import ="org.neo4j.kernel.EmbeddedGraphDatabase" %>
 <%@ page import="java.util.*" %>
 <%@ page import="java.io.*" %>
 <%@ page import="graphDB.explore.*" %>
@@ -100,6 +98,12 @@ public void CreateExtJsChart(String chartName, String storeName, String title, J
 <%
 //EmbeddedGraphDatabase graphDb = new EmbeddedGraphDatabase( DefaultTemplate.GraphDB );
 try{
+
+	String dbName = session.getAttribute("database").toString();
+	if(request.getParameter("db") != null)
+		dbName = request.getParameter("db");//session.getAttribute("id").toString();
+	
+	Transaction tr = DefaultTemplate.graphDb(dbName).beginTx();
 		//registerShutdownHook2(graphDb);
 	//String nodeID = request.getParameter("id");
 	
@@ -218,6 +222,7 @@ try{
 			}
 		}
 	}	
+	tr.success();
 }
 catch(Exception e)
 {

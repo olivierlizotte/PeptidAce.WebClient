@@ -48,16 +48,17 @@ public class Login
 		String passwdToTest = convertString(passwd).toString();
 		String correctPasswd="";
 		//correctPasswd="f71dbe52628a3f83a77ab494817525c6";
-		
+		GraphDatabaseService graphDb = DefaultTemplate.graphDb(DefaultTemplate.GraphDBString_Main);
 		long userID = -1;
-		try	{
-			Index<Node> index = DefaultTemplate.graphDb().index().forNodes("users");
+		try(Transaction tr = graphDb.beginTx())	{
+			Index<Node> index = graphDb.index().forNodes("users");
 			Node userNode = index.get("NickName", login).getSingle();
 			if(userNode != null)
 			{
 				userID = userNode.getId();
 				correctPasswd = userNode.getProperty("passwd").toString();
 			}
+			tr.success();
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -77,17 +78,17 @@ public class Login
 	public static long addUser(String name, String nickName, String passwd)
 	{
 		long nodeID = -1;
-		try	{				
-			Transaction tx = DefaultTemplate.graphDb().beginTx();			
-			
-			Index<Node> index = DefaultTemplate.graphDb().index().forNodes("users");
+		GraphDatabaseService graph = DefaultTemplate.graphDb(DefaultTemplate.GraphDBString_Main); 
+		try(Transaction tx = graph.beginTx())
+		{			
+			Index<Node> index = graph.index().forNodes("users");
 			Node userNodeExisting = index.get("NickName", nickName).getSingle();
 			
 			if(userNodeExisting != null)
 				System.out.println("User already exists!");
 			else
 			{
-				Node userNode = DefaultTemplate.graphDb().createNode();
+				Node userNode = graph.createNode();
 				userNode.setProperty("type", "User");
 				userNode.setProperty("name", name);
 				userNode.setProperty("NickName", nickName);
@@ -99,7 +100,6 @@ public class Login
 				System.out.println("User ID : " + userNode.getId());
 			}
 			tx.success();
-			tx.finish();
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -111,10 +111,9 @@ public class Login
 	 * @param nickName
 	 */
 	public static void deleteUser(String nickName){
-		try	{				
-			Transaction tx = DefaultTemplate.graphDb().beginTx();
-			
-			Index<Node> index = DefaultTemplate.graphDb().index().forNodes("users");
+		try	(Transaction tx = DefaultTemplate.graphDb(DefaultTemplate.GraphDBString_Main).beginTx())
+		{			
+			Index<Node> index = DefaultTemplate.graphDb(DefaultTemplate.GraphDBString_Main).index().forNodes("users");
 			IndexHits<Node> nodes = index.get("NickName", nickName);
 			int nbElem = 0;
 			for (Node node : nodes) {
@@ -122,7 +121,6 @@ public class Login
 				nbElem++;
 			}			
 			tx.success();
-			tx.finish();
 			System.out.println("Deleted " + nbElem + " users.");
 		}catch(Exception e){
 			e.printStackTrace();

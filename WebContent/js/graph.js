@@ -284,7 +284,7 @@ function mouseUp(d)
 
 function mouseDown(d)
 {
-	for(i = 0; i < nodes.length; i++)	
+	for(var i = 0; i < nodes.length; i++)	
 		nodes[i].fixed = false;
 	
 	d.fixed = true;	

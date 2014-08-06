@@ -9,8 +9,6 @@
 <%@ page import="org.neo4j.graphdb.RelationshipType"%>
 <%@ page import="org.neo4j.graphdb.Transaction"%>
 <%@ page import="org.neo4j.graphdb.index.Index"%>
-<%@ page import="org.neo4j.kernel.AbstractGraphDatabase"%>
-<%@ page import="org.neo4j.kernel.EmbeddedGraphDatabase"%>
 <%@ page import="java.util.*"%>
 <%@ page import="java.io.*"%>
 <%@ page import="graphDB.explore.*"%>
@@ -41,6 +39,7 @@
 			DefaultNode theNode = new DefaultNode(nodeID);
 			theNode.Initialize();//TODO optimize this call to prevent preloading when key is not empty 
 			theNode.printGridDataJSON(out, key);
+			tr.success();
 		} catch (Exception e) 
 		{
 			e.printStackTrace();

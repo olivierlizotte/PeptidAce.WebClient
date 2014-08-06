@@ -5,24 +5,22 @@ import graphDB.explore.tools.AlphanumComparator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
-import org.neo4j.graphdb.traversal.Evaluation;
-import org.neo4j.graphdb.traversal.Evaluator;
-import org.neo4j.kernel.EmbeddedGraphDatabase;
-import org.neo4j.kernel.Traversal;
 
 /** This class determines the default behavior of the explorer
  *
@@ -34,7 +32,7 @@ abstract public class DefaultTemplate
 	    running example before it's completed)
 	 * @param graphDb
 	 */
-	public static void registerShutdownHook( final GraphDatabaseService graphDb )
+	public static void registerShutdownHook( final GraphDatabaseService graphDb, final String dbName )
 	{
 	    // Registers a shutdown hook for the Neo4j instance so that it
 	    // shuts down nicely when the VM exits (even if you "Ctrl-C" the
@@ -44,6 +42,7 @@ abstract public class DefaultTemplate
 	        @Override
 	        public void run()
 			{
+	        	theGraphs.remove(dbName);
 	        	CloseDB(graphDb);
 			}
 		} );
@@ -51,9 +50,8 @@ abstract public class DefaultTemplate
 		
 	public static void removeAllTempElements(GraphDatabaseService graphDb )
 	{
-		try
+		try(Transaction tx = graphDb.beginTx())
 		{
-			Transaction tx = graphDb.beginTx();
 			Index<Node> index = graphDb.index().forNodes("tempNodes");
 			IndexHits<Node> tempNodes = index.get("type", "tempNode");
 			while (tempNodes.hasNext())
@@ -65,7 +63,6 @@ abstract public class DefaultTemplate
 				tempNode.delete();
 			}
 			tx.success();
-			tx.finish();
 		}
 		catch(Exception e)
 		{
@@ -80,51 +77,26 @@ abstract public class DefaultTemplate
     		graphDb.shutdown();
 	}
 	
-	public static void SwitchDB(String newPath)
+	public static String GraphDBString_Main = "graphProjects.db";
+	
+	private static HashMap<String, GraphDatabaseService> theGraphs = new HashMap<String, GraphDatabaseService>();
+	
+	
+	synchronized public static GraphDatabaseService graphDb(String dbName)
 	{
-		EmbeddedGraphDatabase newGraph = new EmbeddedGraphDatabase( newPath );
-		registerShutdownHook(newGraph);
-		EmbeddedGraphDatabase previousGraph = theGraph;
-		
-		theGraph = newGraph;
-		CloseDB(previousGraph);
-	}
-	
-	//public static String GraphDBString = "/home/antoine/neo4j/data/graphProject981.db";
-	//public static String GraphDBString = "C:\\_IRIC\\Neo4J\\data\\graph8.db";
-	//public static String GraphDBString = "C:\\_IRIC\\DATA\\M&R\\graphProject981.db";
-	//public static String GraphDBString = "C:\\_IRIC\\DATA\\M&R\\graphProject981_EBV_3.db";
-	//public static String GraphDBString = "C:\\_IRIC\\DATA\\M&R\\bkp\\graphProject981_EBV_3c.db";
-	
-	//public static String GraphDBString = "/home/olivier/Documents/DBs/GVHD2.db";
-	public static String GraphDBString = "C:\\_IRIC\\DATA\\Trinity\\Neo4jA.db";	
-//	public static String GraphDBString = "C:\\_IRIC\\DATA\\MnR\\graph_ExoTrans_Ebv_5ppmb.db";
-	
-//	public static String GraphDBString = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph_ExoTrans_Ebv_5ppmb.db";
-	//public static String GraphDBString = "/apps/Neo4J/neo4j-community-1.8.M03/data/gvhd.db";
-	//public static String GraphDBString = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph_ExoTrans_Ebv_5ppm.db";
-	//public static String GraphDBString = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph3.db";
-	//public static String GraphDBString = "/apps/Neo4J/neo4j-community-1.8.M03/data/graphProject981.db";
-	
-	//Singleton pattern to force every user into a single database connexion object
-	private static EmbeddedGraphDatabase theGraph = null;
-	
-	
-	synchronized public static EmbeddedGraphDatabase graphDb()
-	{
-		if(theGraph == null)
+		if(!theGraphs.containsKey(dbName))
 		{
 			try
 			{
-				theGraph = new EmbeddedGraphDatabase( GraphDBString );
-				registerShutdownHook(theGraph);
+				theGraphs.put(dbName, new GraphDatabaseFactory().newEmbeddedDatabase( dbName ));
+				registerShutdownHook(theGraphs.get(dbName), dbName);
 			}
 			catch(Exception e)
 			{
 				e.printStackTrace();
 			}			
 		}
-		return theGraph;
+		return theGraphs.get(dbName);
 	}
 	
 		
@@ -214,9 +186,9 @@ abstract public class DefaultTemplate
 	 * @param graphDb
 	 * @return
 	 */
-	public static String[] getChartsTools( String nodeID )
+	public static String[] getChartsTools( String nodeID , String dataName)
 	{
-		DefaultNode theNode = new DefaultNode(nodeID);
+		DefaultNode theNode = new DefaultNode(nodeID, dataName);
 		String type = theNode.getType();
 		if("Peptidome".equals(type))
 		{
@@ -269,9 +241,9 @@ abstract public class DefaultTemplate
 		return new String[0];
 	}
 	
-	public static String[] getNodeSpecificTools( String nodeID )
+	public static String[] getNodeSpecificTools( String nodeID, String dataName )
 	{
-		DefaultNode theNode = new DefaultNode(nodeID);
+		DefaultNode theNode = new DefaultNode(nodeID, dataName);
 		String type = theNode.getType();
 		List<String> tools = new ArrayList<String>();
 		if("Peptidome".equals(type))
@@ -315,7 +287,7 @@ abstract public class DefaultTemplate
 	 * @param graphDb EmbeddedGraphDatabase
 	 * @return
 	 */
-	public static String checkForHashTags(String text, Node theNode, Node theUser, EmbeddedGraphDatabase graphDb)
+	public static String checkForHashTags(String text, Node theNode, Node theUser, GraphDatabaseService graphDb)
 	{
 	    StringBuffer sb = new StringBuffer(text.length());	
 		
@@ -356,53 +328,11 @@ abstract public class DefaultTemplate
 		text = text.replaceAll("\\\\", "&#92;");
 		return text;
 	}	
-	
-	/** Creates a relation between the given node, and the closest Experiment node
-	 * @param graphDb EmbeddedGraphDatabase
-	 * @param node Node
-	 * @param relationName String
-	 */
-	public static void linkToExperimentNode(EmbeddedGraphDatabase graphDb, Node node, String relationName)
-	{
-		//TODO When available, use Neo4j option to select the direction of traversal, without specifying relations
 		
-		//Called at every node, checks if its the Experiment node
-		Evaluator test = new Evaluator() {			
-			@Override
-			public Evaluation evaluate(Path arg0) 
-			{
-				String theType = arg0.endNode().getProperty("type", "").toString();
-				if("Experiment".compareTo(theType) == 0)
-					return Evaluation.of(true,  false);
-				else
-					return Evaluation.EXCLUDE_AND_CONTINUE;
-			}
-		};
-		
-		// there should only be one node there, but check for sure
-		int nbExp = 0;
-		Node exp = null;
-		for (Node n : Traversal.traversal().breadthFirst()
-										   .evaluator(test)
-										   .relationships(DynamicRelationshipType.withName("Result"), Direction.INCOMING)
-										   .relationships(DynamicRelationshipType.withName("Source"), Direction.INCOMING) 
-										   .relationships(DynamicRelationshipType.withName("Listed"), Direction.INCOMING) 
-										   .relationships(DynamicRelationshipType.withName("Associated"), Direction.INCOMING) 
-										   .relationships(DynamicRelationshipType.withName("Sequence"), Direction.INCOMING)
-									  	   .relationships(DynamicRelationshipType.withName("Tool_output"), Direction.INCOMING)
-										   .traverse(node).nodes())
-		{
-			exp = n;
-			nbExp++;
-		}
-		if(nbExp == 1)
-			exp.createRelationshipTo(node, DynamicRelationshipType.withName(relationName));
-	}
-	
 	/** Calculate number of elements for a grouping node such as 
 	 * peptides for peptidome, proteins for proteome etc. 
 	 */
-	public static int numberOfElements(EmbeddedGraphDatabase graphDb, Node groupingNode, String nodeTypeToCount){
+	public static int numberOfElements(GraphDatabaseService graphDb, Node groupingNode, String nodeTypeToCount){
 		int nb=0;
 		for (Relationship rel : groupingNode.getRelationships(Direction.OUTGOING)){
 			if (nodeTypeToCount.equals(NodeHelper.getType(rel.getEndNode()))){
@@ -415,7 +345,7 @@ abstract public class DefaultTemplate
 	/** Calculate FPR for a grouping node such as Peptidome, proteome. 
 	 * The nodes OUTGING must have decoy properties. 
 	 */
-	public static double calculateFPR(EmbeddedGraphDatabase graphDb, Node groupingNode){
+	public static double calculateFPR(GraphDatabaseService graphDb, Node groupingNode){
 		Node tmpNode;
 		double total = 0;
 		double targetHits = 0;
@@ -448,7 +378,7 @@ abstract public class DefaultTemplate
 	 *  - Number of nodes for each node grouped to many other.
 	 *  - General Experiment's information: number of peptides, proteins etc.
 	 */
-	public static void addBasicInformation(EmbeddedGraphDatabase graphDb, Long experimentNodeId){
+	public static void addBasicInformation(GraphDatabaseService graphDb, Long experimentNodeId){
 		Node experimentNode = graphDb.getNodeById(experimentNodeId);
 		Node tmpNode;
 		double total;

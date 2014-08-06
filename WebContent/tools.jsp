@@ -2,8 +2,8 @@
 <%@ page import="graphDB.explore.*" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
-<%@ page import ="org.neo4j.kernel.EmbeddedGraphDatabase" %>
 <%@ page import ="org.neo4j.graphdb.GraphDatabaseService" %>
+<%@ page import ="org.neo4j.graphdb.Transaction" %>
 <%@ page import="java.util.*" %>
 <%@ page import="java.io.*" %>
 <html>
@@ -25,17 +25,23 @@
 	
 <%
 	String[] tools = {};
-
+	String dbName = session.getAttribute("database").toString();
 // 	try
 // 	{				
-	
-	if (request.getParameter("name").equals("charts")){
-		tools = DefaultTemplate.getChartsTools(request.getParameter("id"));
+	try{
+		Transaction tr = DefaultTemplate.graphDb(dbName).beginTx();
+		if (request.getParameter("name").equals("charts")){
+			tools = DefaultTemplate.getChartsTools(request.getParameter("id"), dbName);
+		}
+		if(request.getParameter("name").equals("seq")){
+			tools = DefaultTemplate.getNodeSpecificTools(request.getParameter("id"), dbName);
+		}
+		tr.success();
 	}
-	if(request.getParameter("name").equals("seq")){
-		tools = DefaultTemplate.getNodeSpecificTools(request.getParameter("id"));
-	}
-		
+	catch(Exception e)
+	{
+		e.printStackTrace();
+	}			
 	for(String path : tools)
 	{
 		String newDesc = path + "/Description.txt";

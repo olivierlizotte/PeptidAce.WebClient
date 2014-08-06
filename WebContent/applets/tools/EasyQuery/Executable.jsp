@@ -10,8 +10,6 @@
 <%@ page import ="org.neo4j.graphdb.DynamicRelationshipType" %>
 <%@ page import ="org.neo4j.graphdb.Transaction" %>
 <%@ page import ="org.neo4j.graphdb.index.Index" %>
-<%@ page import ="org.neo4j.kernel.AbstractGraphDatabase" %>
-<%@ page import ="org.neo4j.kernel.EmbeddedGraphDatabase" %>
 <%@page import="org.neo4j.cypher.javacompat.*"%>
 <%@page import="java.util.*" %>
 <%@ page import="java.util.List"%>
@@ -23,7 +21,7 @@
 
 
 
-List<Long> getQueryResultAsNodeIds(EmbeddedGraphDatabase graphDb, String cypherQuery){
+List<Long> getQueryResultAsNodeIds(GraphDatabaseService graphDb, String cypherQuery){
 	ExecutionEngine engine = new ExecutionEngine( graphDb );
 	// VERY IMPORTANT : use the org.neo4j.cypher.javacompat.* and not the org.neo4j.cypher.*
 	// otherwise can't iterate over the ExecutionResult
@@ -38,7 +36,7 @@ List<Long> getQueryResultAsNodeIds(EmbeddedGraphDatabase graphDb, String cypherQ
 	return ids;
 }
 
-void createLinkerNodeFromIds(EmbeddedGraphDatabase graphDb, Node newNode, List<Long> ids){
+void createLinkerNodeFromIds(GraphDatabaseService graphDb, Node newNode, List<Long> ids){
 	RelationshipType tempRelType = DynamicRelationshipType.withName("query_Result");
 	for (long id : ids){
 		newNode.createRelationshipTo(graphDb.getNodeById(id), tempRelType);
@@ -100,7 +98,8 @@ for(int i=1 ; i<nbFilters ; i++){
 query += " return ID(p)";
 System.out.println(query);
 
-EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
+String dbName = session.getAttribute("database").toString();
+GraphDatabaseService graphDb = DefaultTemplate.graphDb(dbName);
 
 //Node ResultHeadNode = graphDb.createNode();
 //ResultHeadNode.setProperty("information", "Result of a database query");
@@ -110,35 +109,36 @@ try
 	SimpleDateFormat dateFormat = new SimpleDateFormat ("yyyy.MM.dd 'at' hh:mm:ss");
 	
 	// create a new temp node linked to the resluts
-	Transaction tx = graphDb.beginTx();
-	Node tempNode = graphDb.createNode();
-	tempNode.setProperty("type", "EasyQuery_output");
-	tempNode.setProperty("query", query);
-	tempNode.setProperty("created from", graphDb.getNodeById(Long.valueOf(nodeID)).getProperty("type"));
-	tempNode.setProperty("created from id", graphDb.getNodeById(Long.valueOf(nodeID)).getId());
-	tempNode.setProperty("creation date", dateFormat.format(date));
-	Long tempNodeID = tempNode.getId();
-	createLinkerNodeFromIds(graphDb, tempNode, getQueryResultAsNodeIds(graphDb, query));
+	try(Transaction tx = graphDb.beginTx())
+	{
+		Node tempNode = graphDb.createNode();
+		tempNode.setProperty("type", "EasyQuery_output");
+		tempNode.setProperty("query", query);
+		tempNode.setProperty("created from", graphDb.getNodeById(Long.valueOf(nodeID)).getProperty("type"));
+		tempNode.setProperty("created from id", graphDb.getNodeById(Long.valueOf(nodeID)).getId());
+		tempNode.setProperty("creation date", dateFormat.format(date));
+		Long tempNodeID = tempNode.getId();
+		createLinkerNodeFromIds(graphDb, tempNode, getQueryResultAsNodeIds(graphDb, query));
+		
+		// to know which step of the pipeline it is
+		if(graphDb.getNodeById(Long.valueOf(nodeID)).hasProperty("step")){
+			tempNode.setProperty("step", Integer.valueOf(graphDb.getNodeById(Long.valueOf(nodeID)).getProperty("step").toString())+1);
+		}else{
+			tempNode.setProperty("step",1);
+		}
+		DefaultTemplate.calculateFPR(graphDb, tempNode);
+		// calculate de percentage of decoy peptides removed
 	
-	// to know which step of the pipeline it is
-	if(graphDb.getNodeById(Long.valueOf(nodeID)).hasProperty("step")){
-		tempNode.setProperty("step", Integer.valueOf(graphDb.getNodeById(Long.valueOf(nodeID)).getProperty("step").toString())+1);
-	}else{
-		tempNode.setProperty("step",1);
+		//Link to node it was created from
+		graphDb.getNodeById(Long.valueOf(nodeID)).createRelationshipTo(tempNode,
+									  DynamicRelationshipType.withName("FilterStep"));
+		// add the new node to the index of temp nodes
+		Index<Node> index = graphDb.index().forNodes("tempNodes");
+		
+		index.add(tempNode, "type", "tempNode");
+		out.print(tempNodeID);
+		tx.success();
 	}
-	DefaultTemplate.calculateFPR(graphDb, tempNode);
-	// calculate de percentage of decoy peptides removed
-
-	//Link to node it was created from
-	graphDb.getNodeById(Long.valueOf(nodeID)).createRelationshipTo(tempNode,
-								  DynamicRelationshipType.withName("FilterStep"));
-	// add the new node to the index of temp nodes
-	Index<Node> index = DefaultTemplate.graphDb().index().forNodes("tempNodes");
-	
-	index.add(tempNode, "type", "tempNode");
-	tx.success();
-	tx.finish();
-	out.print(tempNodeID);
 }
 catch(Exception e)
 {

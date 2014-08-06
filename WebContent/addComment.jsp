@@ -12,36 +12,36 @@
 <%@ page import="org.neo4j.graphdb.RelationshipType" %>
 <%@ page import="org.neo4j.graphdb.Transaction" %>
 <%@ page import="org.neo4j.graphdb.index.Index" %>
-<%@ page import="org.neo4j.kernel.AbstractGraphDatabase" %>
-<%@ page import="org.neo4j.kernel.EmbeddedGraphDatabase" %>
 <%@ page import="java.util.*" %>
 <%@ page import="java.io.*" %>
 <%@ page import="graphDB.explore.*" %>
 
 <%
-if(session.getAttribute("user") != null)
-{	
+if(session.getAttribute("user") != null && session.getAttribute("database") != null)
+{
+	String dbName = session.getAttribute("database").toString();	
 	//This jsp will add a comment and send back the new list of comments as a result
 	String nodeID  = request.getParameter("id");
 	String comment = request.getParameter("comment");
 	String userID  = session.getAttribute("userNodeID").toString();
 
-	EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
 	
 	try
 	{				
+		GraphDatabaseService graphDb = DefaultTemplate.graphDb(dbName);
 		String text = DefaultTemplate.Sanitize(comment);
-		
-		Node theNode = graphDb.getNodeById(Long.valueOf(nodeID));
-		Node theUser = graphDb.getNodeById(Long.valueOf(userID));		
-		Transaction tx = graphDb.beginTx();
+
+		try(Transaction tx = graphDb.beginTx())
+		{		
+		 	Node theNode = graphDb.getNodeById(Long.valueOf(nodeID));
+			Node theUser = graphDb.getNodeById(Long.valueOf(userID));		
 			text = DefaultTemplate.checkForHashTags(text, theNode, theUser, graphDb);
 			RelationshipType relType = DynamicRelationshipType.withName( "Comment" );	
 			theNode.createRelationshipTo(theUser, relType).setProperty("Text", text);
-		tx.success();
-		tx.finish();
+			out.println("{" + NodeHelper.getComments(theNode) + "}");	
+			tx.success();
+		}
 		
-		out.println("{" + NodeHelper.getComments(theNode) + "}");	
 	}
 	catch(Exception e)
 	{

@@ -8,8 +8,6 @@
 <%@ page import ="org.neo4j.graphdb.RelationshipType" %>
 <%@ page import ="org.neo4j.graphdb.Transaction" %>
 <%@ page import ="org.neo4j.graphdb.index.Index" %>
-<%@ page import ="org.neo4j.kernel.AbstractGraphDatabase" %>
-<%@ page import ="org.neo4j.kernel.EmbeddedGraphDatabase" %>
 <%@page import="java.util.*" %>
 <%@ page import="java.util.List"%>
 <%@ page import="java.util.Map"%>
@@ -21,8 +19,9 @@
 	var properties=new Array();
 	<%
 	long currentID = Long.valueOf(request.getParameter("id"));
-	EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
-	HashMap<String, HashMap<String, Integer>> typesAndPropertiesRelated = NodeHelper.getRelatedNodeTypesAndProperties( graphDb.getNodeById(currentID));
+
+    String dbName = session.getAttribute("database").toString();
+	HashMap<String, HashMap<String, Integer>> typesAndPropertiesRelated = NodeHelper.getRelatedNodeTypesAndProperties( DefaultTemplate.graphDb(dbName).getNodeById(currentID));
 	String nodeTypesOptions = "";
 	String properties;
 	for (String nodeType : typesAndPropertiesRelated.keySet()){

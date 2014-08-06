@@ -9,22 +9,30 @@
 <%@ page import ="org.neo4j.graphdb.RelationshipType" %>
 <%@ page import ="org.neo4j.graphdb.Transaction" %>
 <%@ page import ="org.neo4j.graphdb.index.Index" %>
-<%@ page import ="org.neo4j.kernel.AbstractGraphDatabase" %>
-<%@ page import ="org.neo4j.kernel.EmbeddedGraphDatabase" %>
 <%@ page import="java.util.*" %>
 <%@ page import="java.io.*" %>
 <%@ page import="graphDB.explore.*" %>
 <%
 if(session.getAttribute("userNodeID") != null)
 {
+	String nodeID = session.getAttribute("userNodeID").toString();
+	String dbName = session.getAttribute("database").toString();
 	try
-	{		
-		String nodeID = session.getAttribute("userNodeID").toString();
-		//if( !session.getAttribute("id").toString().equals("noneEntered"))
+	{	
 		if(request.getParameter("id") != null)
 			nodeID = request.getParameter("id");//session.getAttribute("id").toString();
-		
-		DefaultNode theNode = new DefaultNode(nodeID);
+			
+		if(request.getParameter("db") != null)
+		{
+			dbName = request.getParameter("db");//session.getAttribute("id").toString();
+			session.setAttribute("database", request.getParameter("db"));
+		}
+			
+		Transaction tr = DefaultTemplate.graphDb(dbName).beginTx();
+		//if( !session.getAttribute("id").toString().equals("noneEntered"))
+
+			
+		DefaultNode theNode = new DefaultNode(nodeID, dbName);
 		
 		//Get browsing history (assume single page opening) TODO: make that work for multiple browser window (past params)		 
 		if(session.getAttribute("historyIDs") == null)
@@ -77,10 +85,11 @@ if(session.getAttribute("userNodeID") != null)
 		out.println(theNode.getCommentsVariable("myCommentData"));	
 		
 		NodeHelper.printNavigationNodes(out, theNode.NODE(), 1, "dataObject");
+		tr.success();
 	}
 	catch(Exception e)
 	{
 		e.printStackTrace();
-	}
+	}			
 }
 %>
