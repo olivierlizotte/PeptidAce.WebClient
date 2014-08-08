@@ -157,7 +157,7 @@ public class Grid
 					
 						out.println("{" + 
 								"'Link':'<a href=\"index.jsp?id="
-								+ aNode.getId() + "\">" + NodeHelper.getName(aNode) + "</a>'");
+								+ aNode.getId() + "&db=" + dbName + "\">" + NodeHelper.getName(aNode) + "</a>'");
 		
 						//Add the properties of the relation
 						for(String key : relation.getPropertyKeys())

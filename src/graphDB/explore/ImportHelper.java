@@ -10,14 +10,14 @@ public class ImportHelper {
 		try{
 	        //Node headers:
 	        String read = br.readLine();
-	        String[] headerNodes = read.split(":")[1].split(",");
+	        String[] headerNodes = read.substring(read.indexOf(":") + 1).split(",");
 	        int indexRequest = -1;
 	        for(int i = 0; i < headerNodes.length; i++)
-	        	if(headerNodes[i] == "Request")
+	        	if(headerNodes[i].equals("Request"))
 	        		indexRequest = i;
 	        //Number of nodes
-	        read = br.readLine();
-	        int nbNodes = Integer.parseInt(read.substring(6));
+	        //read = br.readLine();
+	        //int nbNodes = Integer.parseInt(read.substring(6));
 	            
 	        GraphDatabaseService graphDb = DefaultTemplate.graphDb(dbName);
 	        try(Transaction tx = graphDb.beginTx())
@@ -25,31 +25,42 @@ public class ImportHelper {
 	        	//Read all nodes
 	            read = br.readLine();
 	        	int nodesDoneIndex = 0;
-	        	while(read != null && nodesDoneIndex < nbNodes) {
+	        	while(read != null) {
 	                String[] splits = read.split(",");
 	                Node node = graphDb.createNode();
 	                for(int i = 0; i < splits.length; i++)
 	                	if(splits[i].length() > 0)
 	                	{
+	                		if(i > headerNodes.length)
+	                			System.out.println("Line too long");
 	                		if(indexRequest == i)
 	                		{
-	    	                	String[] splitRequest = splits[indexRequest].split("|");
-	    	                	StringBuilder request = new StringBuilder( "<a href=SendRequest(\"");
-	    	                	request.append(splitRequest[0]);
-    	                		request.append("\",[");
-	    	                	if(splitRequest.length > 1)
+	    	                	String[] splitRequest = splits[i].split("\\|");
+	    	                	if(splitRequest.length > 0)
 	    	                	{
-	    	                		request.append(splitRequest[1]);	    	                	
-	    	                		for(int j = 2; j < splitRequest.length; j++)
-	    	                		{
-	    	                			request.append(",\"");
-	    	                			request.append(splitRequest[j]);
-	    	                			request.append("\"");
-	    	                		}
+	    	                		StringBuilder request = new StringBuilder( "<a href=\"#\" onclick=\"SendRequest(\\'");	    	
+	    	                		//StringBuilder request = new StringBuilder( "\"");	 
+		    	                	request.append(splitRequest[0]);
+	    	                		request.append("\\',[");
+		    	                	if(splitRequest.length > 1)
+		    	                	{
+	    	                			request.append("\\'");
+		    	                		request.append(splitRequest[1]);	    	
+	    	                			request.append("\\'");                	
+		    	                		for(int j = 2; j < splitRequest.length; j++)
+		    	                		{
+		    	                			request.append(",\\'");
+		    	                			request.append(splitRequest[j]);
+		    	                			request.append("\\'");
+		    	                		}
+		    	                	}
+		    	                	request.append("]);\">view</a>");
+		    	                	//request.append("]");
+		    	                		
+		    	                	node.setProperty(headerNodes[i], request.toString());
 	    	                	}
-	    	                	request.append("]);>view</a>");
-	    	                		
-	    	                	node.setProperty(headerNodes[i], request.toString());
+	    	                	else
+	    	                		System.out.println("empty request?");
 	                		}
 	                		else
 	                			node.setProperty(headerNodes[i], splits[i]);
@@ -73,21 +84,17 @@ public class ImportHelper {
 		{  
             //Link headers
             String read = br.readLine();
-            String[] headerLinks = read.split(":")[1].split(",");
+	        String[] headerLinks = read.substring(read.indexOf(":") + 1).split(",");
 	        int indexRequest = -1;
 	        for(int i = 0; i < headerLinks.length; i++)
-	        	if(headerLinks[i] == "Request")
+	        	if(headerLinks[i].equals("Request"))
 	        		indexRequest = i;
-            //Number of nodes
-            read = br.readLine();
-            int nbLinks = Integer.parseInt(read.substring(6));
             GraphDatabaseService graphDb = DefaultTemplate.graphDb(dbName);
             try(Transaction tx = graphDb.beginTx())
             {
             	//Read all links
 	            read = br.readLine();
-            	int linksDoneIndex = 0;
-            	while(read != null && linksDoneIndex < nbLinks) {
+            	while(read != null) {
                     String[] splits = read.split(",");
                     long indexNodeSource = Long.parseLong(splits[0]);
 	                Node source = graphDb.getNodeById(indexNodeSource);
@@ -100,24 +107,35 @@ public class ImportHelper {
 	                	if(splits[i].length() > 0)
 	                		if(indexRequest == i)
 	                		{
-	    	                	String[] splitRequest = splits[indexRequest].split("|");
-	    	                	StringBuilder request = new StringBuilder( "<a href=SendRequest(\"");
-	    	                	request.append(splitRequest[0]);
-	    	                	request.append("\"");
-	    	                	for(int j = 1; j < splitRequest.length; j++)
-	    	                	{
-	    	                		request.append(",\"");
-	    	                		request.append(splitRequest[j]);
-		    	                	request.append("\"");
-	    	                	}
-	    	                	request.append(");>view</a>");
-	    	                		
-	    	                	currentRelationship.setProperty(headerLinks[i], request.toString());
+	    	                	String[] splitRequest = splits[i].split("\\|");
+	    	                	if(splitRequest.length > 0)
+	    	                	{    	                	
+	    	                		StringBuilder request = new StringBuilder( "<a href=\"#\" onclick=\"SendRequest(\\'");
+	    	                		//StringBuilder request = new StringBuilder( "\"");	 
+		    	                	request.append(splitRequest[0]);
+	    	                		request.append("\\',[");
+		    	                	if(splitRequest.length > 1)
+		    	                	{
+	    	                			request.append("\\'");
+		    	                		request.append(splitRequest[1]);	    	
+	    	                			request.append("\\'");                	
+		    	                		for(int j = 2; j < splitRequest.length; j++)
+		    	                		{
+		    	                			request.append(",\\'");
+		    	                			request.append(splitRequest[j]);
+		    	                			request.append("\\'");
+		    	                		}
+		    	                	}
+		    	                	request.append("]);\">view</a>");
+		    	                		
+		    	                	currentRelationship.setProperty(headerLinks[i], request.toString());
+		    	                }
+	    	                	else
+	    	                		System.out.println("empty request?");
 	                		}
 	                		else
 	                			currentRelationship.setProperty(headerLinks[i], splits[i]);
 
-	                linksDoneIndex++;
 	                read = br.readLine();		                
 	            }
 	            tx.success();

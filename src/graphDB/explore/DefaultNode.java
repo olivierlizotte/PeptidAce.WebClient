@@ -32,8 +32,8 @@ public class DefaultNode
 		String AttributeObjectString = "";
 		for (String key : theNode.getPropertyKeys()) {
 			if (DefaultTemplate.keepAttribute(key))
-				AttributeObjectString += ",\"" + key + "\":\""
-						+ DefaultTemplate.Sanitize(theNode.getProperty(key).toString()) + "\"";
+				AttributeObjectString += ",'" + key + "':'"
+						+ DefaultTemplate.Sanitize(theNode.getProperty(key).toString(), false) + "'";
 		}
 		if (AttributeObjectString.isEmpty())
 			output += "};\n";
@@ -111,7 +111,13 @@ public class DefaultNode
 
 	public String getType() {
 		try {
-			return theNode.getProperty("type").toString();
+			if(theNode.hasProperty("type"))
+				return theNode.getProperty("type").toString();
+			else
+				if(theNode.hasProperty("Type"))
+					return theNode.getProperty("Type").toString();
+				else
+					return "";
 		} catch (Exception e) {
 			return "";
 		}

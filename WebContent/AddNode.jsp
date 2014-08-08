@@ -21,6 +21,7 @@ if(session.getAttribute("user") != null)
 			Long tempNodeID = newNode.getId();
 			out.println(tempNodeID);	
 			tx.success();
+			tx.close();
 		}		
 	}
 	catch(Exception e)

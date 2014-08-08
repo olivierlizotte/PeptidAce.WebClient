@@ -51,6 +51,7 @@ if(session.getAttribute("user") != null)
 	        	theNode.setProperty(nameArray.getString(i), valArray.get(i));
 	        }       		
 		tx.success();
+		tx.close();
 		out.println(request.getParameter("json"));	
 	}
 	catch(Exception e)

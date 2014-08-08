@@ -77,6 +77,7 @@ if(session.getAttribute("userNodeID") != null)
 
 		//Create javascript variables
 		out.println("var currentNodeID=" + theNode.getId() + ";\n");
+		out.println("var currentDB=\"" + dbName + "\";\n");
 		out.println("var currentNodeType=\""+theNode.getType()+"\";\n");
 		out.println("var browserHistory=\"" + strHistory + "\";\n");
 		out.println(theNode.getAttributeJSON("myAttributeObject"));
@@ -86,6 +87,7 @@ if(session.getAttribute("userNodeID") != null)
 		
 		NodeHelper.printNavigationNodes(out, theNode.NODE(), 1, "dataObject");
 		tr.success();
+		tr.close();
 	}
 	catch(Exception e)
 	{

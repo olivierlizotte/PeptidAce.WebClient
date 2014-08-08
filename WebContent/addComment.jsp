@@ -29,19 +29,19 @@ if(session.getAttribute("user") != null && session.getAttribute("database") != n
 	try
 	{				
 		GraphDatabaseService graphDb = DefaultTemplate.graphDb(dbName);
-		String text = DefaultTemplate.Sanitize(comment);
+		String text = DefaultTemplate.Sanitize(comment, false);
 
-		try(Transaction tx = graphDb.beginTx())
-		{		
-		 	Node theNode = graphDb.getNodeById(Long.valueOf(nodeID));
-			Node theUser = graphDb.getNodeById(Long.valueOf(userID));		
-			text = DefaultTemplate.checkForHashTags(text, theNode, theUser, graphDb);
-			RelationshipType relType = DynamicRelationshipType.withName( "Comment" );	
-			theNode.createRelationshipTo(theUser, relType).setProperty("Text", text);
-			out.println("{" + NodeHelper.getComments(theNode) + "}");	
-			tx.success();
-		}
+		Transaction tx = graphDb.beginTx();
 		
+	 	Node theNode = graphDb.getNodeById(Long.valueOf(nodeID));
+		Node theUser = graphDb.getNodeById(Long.valueOf(userID));		
+		text = DefaultTemplate.checkForHashTags(text, theNode, theUser, graphDb);
+		RelationshipType relType = DynamicRelationshipType.withName( "Comment" );	
+		theNode.createRelationshipTo(theUser, relType).setProperty("Text", text);
+		out.println("{" + NodeHelper.getComments(theNode) + "}");	
+		tx.success();
+		tx.close();
+				
 	}
 	catch(Exception e)
 	{

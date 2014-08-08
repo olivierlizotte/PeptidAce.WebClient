@@ -15,7 +15,7 @@
 <script type="text/javascript" src="js/ExtJS/bootstrap.js"></script>
 <link rel="stylesheet" type="text/css" href="js/ExtJS/resources/css/ext-all.css" />
 
-    <script type="text/javascript" src="js/d3/d3.v3.js" charset="utf-8"></script>
+    <script type="text/javascript" src="js/d3/d3.js" charset="utf-8"></script>
     <!-- script type="text/javascript" src="js/d3/d3.geom.js"></script-->
     <!--  script type="text/javascript" src="js/d3/d3.layout.js"></script -->    
 	<script type="text/javascript" src="js/d3/nv.d3_forkarlm.js"></script>
@@ -256,7 +256,7 @@ function AddAttribute(btn, text)
 function AddNode(btn, text)
 {
    	Ext.Ajax.request({
- 				url   : "AddNode.jsp?id=" + currentNodeID,
+ 				url   : "AddNode.jsp?id=" + currentNodeID + "&db=" + currentDB,
  				type  : 'POST',
  				//data  : myAttributeObject,
  				params: {type: text},
@@ -348,7 +348,7 @@ function CreateAttributes(attribs)
 		   	    handler: function() 
 		   	    {
 		   	    	Ext.Ajax.request({
-   		      				url   : "EditAttribute.jsp?id=" + currentNodeID,
+   		      				url   : "EditAttribute.jsp?id=" + currentNodeID + "&db=" + currentDB,
    		      				type  : 'POST',
    		      				//data  : myAttributeObject,
    		      				params: {json: Ext.encode(myAttributeObject)},
@@ -789,16 +789,16 @@ function OnNodeClick(node)
 
     	$("#spectrum").empty();
         // render the spectrum with the given options 
-        $("#spectrum").specview({ sequence: spectrum.sequence,
-            scanNum: spectrum.scanNum,
-            charge: spectrum.charge,
-            precursorMz: spectrum.precursorMz,
-            fileName: spectrum.fileName,
+        $("#spectrum").specview({ sequence: spectrum.Sequence,
+            scanNum: spectrum.ScanNumber,
+            charge: spectrum.PrecursorCharge,
+            precursorMz: spectrum.PrecursorMZ,
+            fileName: spectrum.Source,
             staticMods: spectrum.staticMods,
             variableMods: spectrum.variableMods,
             ntermMod: spectrum.ntermMod,
             ctermMod: spectrum.ctermMod,
-            peaks: spectrum.peaks
+            peaks: spectrum.Peaks
         });
 
         OpenWindow("spectrum");
@@ -859,12 +859,20 @@ function getQueryParams(qs) {
     return params;
 }
 
-function SendRequest( command,  arrayOfPAram){
-    trinityConn.send(JSON.stringify({ Type : command, Data : arrayOfParam}));    	
+function SendRequest( command,  arrayOfParam){
+	if(myAttributeObject && myAttributeObject.Sequence)
+			arrayOfParam.push(myAttributeObject.Sequence);
+	if(trinityConn.readyState == trinityConn.OPEN)
+		trinityConn.send(JSON.stringify({ Type : command, Data : arrayOfParam}));
+	else
+		MessageTop.msg("PeptidAce Server is offline", "Could not run command");    	
 }
 
 function RequestSpectrum( theSource,  theScan,  theSequence){
-    trinityConn.send(JSON.stringify({ Type : "ShowSpectrum", Source : theSource, Scan : theScan, Sequence : theSequence}));    	
+	if(trinityConn.readyState == trinityConn.OPEN)
+	    trinityConn.send(JSON.stringify({ Type : "ShowSpectrum", Source : theSource, Scan : theScan, Sequence : theSequence}));    
+	else
+		MessageTop.msg("PeptidAce Server is offline", "Could not run command");   	
 }
 
 function CheckQueryParam()
@@ -948,6 +956,8 @@ OpenConsole();
     	retryTrinityConnection();
 
     	CheckQueryParam();
+    	
+    	CloseConsole();
     });//*/
 </script>
 </body>

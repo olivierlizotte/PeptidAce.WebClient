@@ -320,12 +320,15 @@ abstract public class DefaultTemplate
 	 * @param input String
 	 * @return String sanitized
 	 */
-	public static String Sanitize(String input)
+	public static String Sanitize(String input, boolean removeQuotes)
 	{
 		String text = input.replaceAll("\\r","<br/>");
 		text = text.replaceAll("\\n","<br/>");
-		text = text.replaceAll("\\\"", "&#34;");
-		text = text.replaceAll("\\\\", "&#92;");
+		if(removeQuotes)
+		{
+			text = text.replaceAll("\\\"", "&#34;");
+			text = text.replaceAll("\\\\", "&#92;");
+		}
 		return text;
 	}	
 		

@@ -36,6 +36,7 @@ if(session.getAttribute("user") != null)
 		Transaction tr = DefaultTemplate.graphDb(dbName).beginTx();
 		Grid.GetList(out, iStart, iLimit, sort, nodeId, nodeType, filter, dbName);
 		tr.success();
+		tr.close();
 	}
 	catch(Exception e)
 	{

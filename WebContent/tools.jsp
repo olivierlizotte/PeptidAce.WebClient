@@ -37,6 +37,7 @@
 			tools = DefaultTemplate.getNodeSpecificTools(request.getParameter("id"), dbName);
 		}
 		tr.success();
+		tr.close();
 	}
 	catch(Exception e)
 	{
