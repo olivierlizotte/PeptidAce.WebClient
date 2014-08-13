@@ -24,22 +24,29 @@ public class DefaultNode
 		return "var " + varName + " = " + NodeHelper.getComments(theNode) + ";\n";
 	}
 
-	public String getAttributeJSON(String varName) 
+	public void printAttributeJSON(JspWriter out) 
 	{
-		// EDITING THE STRING
-		String output = "var " + varName + " = {";
-
-		String AttributeObjectString = "";
-		for (String key : theNode.getPropertyKeys()) {
-			if (DefaultTemplate.keepAttribute(key))
-				AttributeObjectString += ",'" + key + "':'"
-						+ DefaultTemplate.Sanitize(theNode.getProperty(key).toString(), false) + "'";
+		try 
+		{
+			// EDITING THE STRING
+			out.print("{");
+			boolean first = true;
+			for (String key : theNode.getPropertyKeys()) {
+				if (DefaultTemplate.keepAttribute(key))
+				{
+					if(first)
+					{
+						out.print("'" + key + "': " + NodeHelper.MakeJSONFriendly(theNode.getProperty(key)));
+						first = false;
+					}
+					else
+						out.print(", '" + key + "': " + NodeHelper.MakeJSONFriendly(theNode.getProperty(key)));
+				}
+			}
+			out.print("}");
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		if (AttributeObjectString.isEmpty())
-			output += "};\n";
-		else
-			output += AttributeObjectString.substring(1) + "};\n";
-		return output;
 	}
 
 	/**

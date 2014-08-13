@@ -2,7 +2,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 
-    <title>Advanced BioInformatic Computing and Development Engine</title>
+    <title>Sonata in mhC Minor</title>
 
 <!-- CSS Files -->
 <link type="text/css" href="css/msg.css" rel="stylesheet" />
@@ -11,13 +11,10 @@
 <!-- JavaScript -->
 <script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
 
-<!-- Ext JS Library file -->
 <script type="text/javascript" src="js/ExtJS/bootstrap.js"></script>
 <link rel="stylesheet" type="text/css" href="js/ExtJS/resources/css/ext-all.css" />
 
     <script type="text/javascript" src="js/d3/d3.js" charset="utf-8"></script>
-    <!-- script type="text/javascript" src="js/d3/d3.geom.js"></script-->
-    <!--  script type="text/javascript" src="js/d3/d3.layout.js"></script -->    
 	<script type="text/javascript" src="js/d3/nv.d3_forkarlm.js"></script>
 	<script type="text/javascript" src="js/jquery.tipsy.js"></script>
     <link href="css/tipsy.css" rel="stylesheet" type="text/css" />
@@ -28,8 +25,6 @@
     <meta name="Description" content="BioInformatic Javascript Development Framework"/>
     <link rel="sitemap" type="application/xml" title="Sitemap" href=""/>
     <link rel="shortcut icon" href="favicon.ico"/>
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-    <!--script src="js/jquery-1.7.1.min.js"></script-->
     <script type='text/javascript' src="js/jquery.mousewheel-min.js"></script>
     
     <script type="text/javascript" src="lorikeet/js/jquery.flot.js"></script>
@@ -43,9 +38,7 @@
     <script type='text/javascript' src="js/jquery.terminal-min.js"></script>
     <link href="css/jquery.terminal.css" rel="stylesheet"/>	
     <script type='text/javascript' src="js/console.js"></script>
-
-
-        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.4/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.4/jquery-ui.min.js"></script>
     
 
 	<link href="css/window.css" rel="stylesheet"/>
@@ -785,19 +778,19 @@ function OnNodeClick(node)
         OpenWindow("sources");
     }//*/
 
-    function DisplaySpectrum(spectrum) {
+    function DisplaySpectrum(spectrum, arrayOfParam) {
 
     	$("#spectrum").empty();
         // render the spectrum with the given options 
-        $("#spectrum").specview({ sequence: spectrum.Sequence,
+        $("#spectrum").specview({ sequence: arrayOfParam[0],
             scanNum: spectrum.ScanNumber,
             charge: spectrum.PrecursorCharge,
             precursorMz: spectrum.PrecursorMZ,
             fileName: spectrum.Source,
-            staticMods: spectrum.staticMods,
-            variableMods: spectrum.variableMods,
-            ntermMod: spectrum.ntermMod,
-            ctermMod: spectrum.ctermMod,
+            staticMods: arrayOfParam[1],
+            variableMods: arrayOfParam[2],
+            ntermMod: arrayOfParam[3],
+            ctermMod: arrayOfParam[4],
             peaks: spectrum.Peaks
         });
 
@@ -859,13 +852,21 @@ function getQueryParams(qs) {
     return params;
 }
 
-function SendRequest( command,  arrayOfParam){
-	if(myAttributeObject && myAttributeObject.Sequence)
-			arrayOfParam.push(myAttributeObject.Sequence);
-	if(trinityConn.readyState == trinityConn.OPEN)
-		trinityConn.send(JSON.stringify({ Type : command, Data : arrayOfParam}));
-	else
-		MessageTop.msg("PeptidAce Server is offline", "Could not run command");    	
+function SendRequest( command, nodeid,  arrayOfParam){
+	if(command == "DisplaySpectrum"){
+		if(nodeid == currentNodeID){
+			DisplaySpectrum(myAttributeObject, arrayOfParam);
+		}
+		else{
+			$.post(	"GetNode.jsp",
+			//$.getJSON("GetNode.jsp",
+					{"id":nodeid,"database": currentDB}, 
+					function(results)
+					{				 	
+						DisplaySpectrum(eval("(" + results + ")"), arrayOfParam);
+					});
+		}
+	}	
 }
 
 function RequestSpectrum( theSource,  theScan,  theSequence){
@@ -953,7 +954,7 @@ OpenConsole();
     $(document).ready(function () {   
     	window.WebSocket = window.WebSocket || window.MozWebSocket;
 
-    	retryTrinityConnection();
+    	//retryTrinityConnection();
 
     	CheckQueryParam();
     	

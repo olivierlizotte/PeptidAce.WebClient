@@ -80,7 +80,9 @@ if(session.getAttribute("userNodeID") != null)
 		out.println("var currentDB=\"" + dbName + "\";\n");
 		out.println("var currentNodeType=\""+theNode.getType()+"\";\n");
 		out.println("var browserHistory=\"" + strHistory + "\";\n");
-		out.println(theNode.getAttributeJSON("myAttributeObject"));
+		out.print("var myAttributeObject=");
+		theNode.printAttributeJSON(out);
+		out.print(";\n");
 		theNode.printGridDataJSON(out);
 		
 		out.println(theNode.getCommentsVariable("myCommentData"));	

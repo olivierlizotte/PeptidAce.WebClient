@@ -395,7 +395,9 @@ public class NodeHelper
 		{
 			String str = (String)value;
 			if(str.startsWith("http"))
-				return "<a href=\"" + value + "\">" + value + "</a>";
+				return "<a href=\"" + value + "\">link</a>";
+			else if(str.length() > 256)
+				return str.substring(0, 128) + "...";
 		}
 		if(value instanceof Double)
 		{
@@ -406,6 +408,23 @@ public class NodeHelper
 		return value + "";
 	}
 
+	public static String MakeJSONFriendly(Object value)
+	{
+		if(value instanceof String)
+		{
+			String str = (String)value;
+			if(str.startsWith("http"))
+				return "<a href=\"" + value + "\">link</a>";
+			else if(str.startsWith("{") || str.startsWith("["))
+				return str;
+			else 
+				return "'" + str + "'";
+		}
+		if(value instanceof Double)  
+			return value.toString();
+		return value + "";
+	}
+	
 	public static int PropertyToInt(Object value)
 	{
 		if(value instanceof String)
@@ -466,6 +485,7 @@ public class NodeHelper
 		if (toAdd != null && !toAdd.isEmpty())
 			result += "," + toAdd;
 		return result 		
+				+ ",id:'" + theNode.getId() + "'"
 				+ ",type:'" + getType(theNode) + "'"
 				+ ",info:'" + getInfo(theNode, size) + "'"
 				+ ",size:" + size

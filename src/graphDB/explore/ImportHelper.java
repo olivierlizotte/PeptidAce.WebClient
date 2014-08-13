@@ -31,44 +31,42 @@ public class ImportHelper {
 	                for(int i = 0; i < splits.length; i++)
 	                	if(splits[i].length() > 0)
 	                	{
-	                		if(i > headerNodes.length)
-	                			System.out.println("Line too long");
 	                		if(indexRequest == i)
 	                		{
 	    	                	String[] splitRequest = splits[i].split("\\|");
 	    	                	if(splitRequest.length > 0)
 	    	                	{
-	    	                		StringBuilder request = new StringBuilder( "<a href=\"#\" onclick=\"SendRequest(\\'");	    	
-	    	                		//StringBuilder request = new StringBuilder( "\"");	 
+	    	                		StringBuilder request = new StringBuilder( "<a href=\"#\" onclick=\\'SendRequest(\"");	    
 		    	                	request.append(splitRequest[0]);
-	    	                		request.append("\\',[");
+	    	                		request.append("\",");
+	    	                		request.append(node.getId());
+	    	                		request.append(",[");
 		    	                	if(splitRequest.length > 1)
 		    	                	{
-	    	                			request.append("\\'");
+	    	                			//request.append("\\'");
 		    	                		request.append(splitRequest[1]);	    	
-	    	                			request.append("\\'");                	
+	    	                			//request.append("\\'");                	
 		    	                		for(int j = 2; j < splitRequest.length; j++)
 		    	                		{
-		    	                			request.append(",\\'");
+		    	                			request.append(",");//,\\'");
 		    	                			request.append(splitRequest[j]);
-		    	                			request.append("\\'");
+		    	                			//request.append("\\'");
 		    	                		}
 		    	                	}
-		    	                	request.append("]);\">view</a>");
+		    	                	request.append("]);\\'>view</a>");
 		    	                	//request.append("]");
 		    	                		
 		    	                	node.setProperty(headerNodes[i], request.toString());
 	    	                	}
-	    	                	else
-	    	                		System.out.println("empty request?");
 	                		}
 	                		else
-	                			node.setProperty(headerNodes[i], splits[i]);
+	                			node.setProperty(headerNodes[i], splits[i].replace('~', ','));
 	                	}
 	
 	                	
 	                out.println(nodesDoneIndex + ":" + node.getId());
 	                nodesDoneIndex++;
+	                
 	                read = br.readLine();		                
 	            }
 	            tx.success();
@@ -104,38 +102,40 @@ public class ImportHelper {
 	    			RelationshipType relType = DynamicRelationshipType.withName( typeOfLink );	
 	    			Relationship currentRelationship = source.createRelationshipTo(destination, relType);
 	                for(int i = 3; i < splits.length; i++)
-	                	if(splits[i].length() > 0)
+	                {
+	                	if(splits[i].length() > 0){
 	                		if(indexRequest == i)
 	                		{
 	    	                	String[] splitRequest = splits[i].split("\\|");
 	    	                	if(splitRequest.length > 0)
-	    	                	{    	                	
-	    	                		StringBuilder request = new StringBuilder( "<a href=\"#\" onclick=\"SendRequest(\\'");
-	    	                		//StringBuilder request = new StringBuilder( "\"");	 
+	    	                	{
+	    	                		StringBuilder request = new StringBuilder( "<a href=\"#\" onclick=\\'SendRequest(\"");	    
 		    	                	request.append(splitRequest[0]);
-	    	                		request.append("\\',[");
+	    	                		request.append("\",");
+	    	                		request.append(indexNodeDestination);
+	    	                		request.append(",[");
 		    	                	if(splitRequest.length > 1)
 		    	                	{
-	    	                			request.append("\\'");
+	    	                			//request.append("\\'");
 		    	                		request.append(splitRequest[1]);	    	
-	    	                			request.append("\\'");                	
+	    	                			//request.append("\\'");                	
 		    	                		for(int j = 2; j < splitRequest.length; j++)
 		    	                		{
-		    	                			request.append(",\\'");
+		    	                			request.append(",");//,\\'");
 		    	                			request.append(splitRequest[j]);
-		    	                			request.append("\\'");
+		    	                			//request.append("\\'");
 		    	                		}
 		    	                	}
-		    	                	request.append("]);\">view</a>");
+		    	                	request.append("]);\\'>view</a>");
+		    	                	//request.append("]");
 		    	                		
 		    	                	currentRelationship.setProperty(headerLinks[i], request.toString());
 		    	                }
-	    	                	else
-	    	                		System.out.println("empty request?");
 	                		}
 	                		else
-	                			currentRelationship.setProperty(headerLinks[i], splits[i]);
-
+	                			currentRelationship.setProperty(headerLinks[i], splits[i].replace('~', ','));
+	                	}
+	                }
 	                read = br.readLine();		                
 	            }
 	            tx.success();

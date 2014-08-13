@@ -159,15 +159,15 @@ public class Grid
 								"'Link':'<a href=\"index.jsp?id="
 								+ aNode.getId() + "&db=" + dbName + "\">" + NodeHelper.getName(aNode) + "</a>'");
 		
-						//Add the properties of the relation
-						for(String key : relation.getPropertyKeys())
-							if(DefaultTemplate.keepAttribute(key))
-								out.print(",'" + key + "':'" + NodeHelper.MakeHtmlFriendly(relation.getProperty(key)) + "'");
-						
 						//Add the properties of the node
 						for(String key : aNode.getPropertyKeys())
 							if(DefaultTemplate.keepAttribute(key) && !DefaultTemplate.isNameAttribute(key))
 									out.print(",'" + key + "':'" + NodeHelper.MakeHtmlFriendly(aNode.getProperty(key)) + "'");
+
+						//Add the properties of the relation
+						for(String key : relation.getPropertyKeys())
+							if(DefaultTemplate.keepAttribute(key))
+								out.print(",'" + key + "':'" + NodeHelper.MakeHtmlFriendly(relation.getProperty(key)) + "'");
 						
 						out.print(",Relation:'" + relation.getType().name() + "',Type:'" + NodeHelper.getType(aNode) + "'}");
 					}
