@@ -69,6 +69,7 @@
 			proxy: {
 				type: 'rest',
 				url : 'GetList.jsp',
+				timeout:120000,
 				extraParams : { 
 					id : currentNodeID,
 					type : keyName
@@ -215,8 +216,9 @@
 															plain : true,
 															//autoLoad: {url:'tool.jsp?name='+keyName+'&url='+document.URL, scripts:true},
 															loader : {
-																url : 'applets/tools/CsvExport/Launcher.jsp?url='
-																		+ document.URL+'&id='+currentNodeID,
+																url : 'applets/tools/CsvExport/Launcher.jsp?id=' + currentNodeID + '&url='
+																		+ document.URL,
+																timeout:120000,
 																scripts : true,
 																autoLoad : true,
 																renderer : 'html'

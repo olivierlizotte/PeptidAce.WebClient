@@ -78,6 +78,7 @@ abstract public class DefaultTemplate
 	}
 	
 	public static String GraphDBString_Main = "graphProjects.db";
+	public static String MainSiteAdress = "localhost:8080/PeptidAce.WebClient/";
 	
 	private static HashMap<String, GraphDatabaseService> theGraphs = new HashMap<String, GraphDatabaseService>();
 	

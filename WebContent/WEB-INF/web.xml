@@ -6,9 +6,9 @@
   </security-role>
   <security-constraint>
     <web-resource-collection>
-      <web-resource-name>applets</web-resource-name>
+      <web-resource-name>admin</web-resource-name>
       <url-pattern>/admin2/*</url-pattern>
-      <url-pattern>/applets/*</url-pattern>
+      <url-pattern>/admin/*</url-pattern>
     </web-resource-collection>
     <auth-constraint>
       <role-name>editor</role-name>

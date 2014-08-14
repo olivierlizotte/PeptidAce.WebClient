@@ -216,7 +216,7 @@ public class NodeHelper
 		int   theNodeIndex;
 		ArrayList<Integer> theRelationIndexes = new ArrayList<Integer>();
 		String strToAdd = "";
-		String theRelationInfo = "";
+		StringBuilder theRelationInfo = new StringBuilder();
 		Node theNode;
 		int Size = 0;
 		public String getNodeInfo()
@@ -226,7 +226,7 @@ public class NodeHelper
 		
 		public String getRelationInfo()
 		{
-			return theRelationInfo;
+			return theRelationInfo.toString();
 		}
 		
 		public NavNode(int index, Node node)
@@ -253,9 +253,9 @@ public class NodeHelper
 		{
 			if(!(theRelationIndexes.contains(source) || theRelationIndexes.contains(target)))
 			{
-				if(!theRelationInfo.isEmpty())
-					theRelationInfo += "},{";
-				theRelationInfo += "source:" + source + ",target:" + target + ",name:'" + relation.getType().name() + "'";
+				if(theRelationInfo.length() > 0)
+					theRelationInfo.append("},{");
+				theRelationInfo.append("source:" + source + ",target:" + target + ",name:'" + relation.getType().name() + "'");
 				if(source == theNodeIndex)
 					theRelationIndexes.add(target);
 				else
@@ -309,7 +309,7 @@ public class NodeHelper
 			}	
 			out.print("],links:[");
 			for (NavNode nav : result.values())
-				if(!nav.theRelationInfo.isEmpty())
+				if(nav.theRelationInfo.length() > 0)
 					out.println("{" + nav.getRelationInfo() + "},");
 			out.print("]};");		
 		} catch (Exception e) {
@@ -338,7 +338,7 @@ public class NodeHelper
 		
 		HashMap<String, HashMap<String, Integer>> TypesAndAttributesRelated = new HashMap<String,HashMap<String, Integer>>();
 		String otherNodeType;
-		for (Relationship r : n.getRelationships(Direction.OUTGOING)){
+		for (Relationship r : n.getRelationships()){
 			if(DefaultTemplate.keepRelation(r.getType().toString())){
 				otherNodeType = getType(r.getOtherNode(n));
 				if (!TypesAndAttributesRelated.containsKey(otherNodeType))
@@ -351,6 +351,22 @@ public class NodeHelper
 			}
 		}
 		return TypesAndAttributesRelated;
+	}
+	
+	public static HashMap<String, Integer> getRelatedNodeTypes(Node n){
+		
+		HashMap<String, Integer> typesRelated = new HashMap<String, Integer>();
+		String otherNodeType;
+		for (Relationship r : n.getRelationships()){
+			if(DefaultTemplate.keepRelation(r.getType().toString())){
+				otherNodeType = getType(r.getOtherNode(n));
+				if (!typesRelated.containsKey(otherNodeType))
+					typesRelated.put(otherNodeType, 1);
+				//else
+					//typesRelated.put(otherNodeType, typesRelated.get(otherNodeType));
+			}
+		}
+		return typesRelated;
 	}
 	
 	private static HashMap<String, NavNode> getNavigationNodes(Node theNode, int depth, HashMap<String, NavNode> result, int index) throws IOException

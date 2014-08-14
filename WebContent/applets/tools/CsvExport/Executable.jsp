@@ -12,12 +12,16 @@ try
 
 	String nodeID = request.getParameter("id").toString();
     String nodeType = request.getParameter("nodeType").toString();
-    String nodeProperties = request.getParameter("nodeProperties").toString();
+    //String nodeProperties = request.getParameter("nodeProperties").toString();
 
     String dbName = session.getAttribute("database").toString();
-    Node currentNode = DefaultTemplate.graphDb(dbName).getNodeById(Long.valueOf(request.getParameter("id"))); 
-
-	Grid.GetListAsCsv(out, nodeProperties, nodeID, nodeType, dbName);
+    
+    GraphDatabaseService graph = DefaultTemplate.graphDb(dbName);
+    Transaction tx = graph.beginTx();
+    Node currentNode = graph.getNodeById(Long.valueOf(request.getParameter("id")));	
+	Grid.GetListAsCsv(out, "", nodeID, nodeType, dbName); 
+	tx.success();
+	tx.close();
 }
 catch(Exception e) // file IO errors
 {

@@ -903,16 +903,16 @@
                     var seriesData = getCalculatedSeries(ionSeries, ntermIons[n]);
                     var neutralLosses = getNeutralLosses(container);
                     var sion = seriesData[i];
-			for(var nl = 0; nl < neutralLosses.length; nl += 1) {
-				var neutralLoss = neutralLosses[nl];
-				if(!neutralLoss.applies(sion)) {
-					continue;
+					for(var nl = 0; nl < neutralLosses.length; nl += 1) {
+						var neutralLoss = neutralLosses[nl];
+						if(!neutralLoss.applies(sion)) {
+							continue;
+						}
+						var ionLabel = matchLabel(sion, neutralLoss.label);
+						var ionmz = ionMz(sion, neutralLoss.label);
+						allIons.push({"mz": ionmz, "label": ionLabel, matched: false});
+			        }
 				}
-				var ionLabel = matchLabel(sion, neutralLoss.label);
-				var ionmz = ionMz(sion, neutralLoss.label);
-				allIons.push({"mz": ionmz, "label": ionLabel, matched: false});
-	                }
-		}
             }
             
             for(var c = 0; c < ctermIons.length; c += 1) {
@@ -921,15 +921,15 @@
                     var idx = options.sequence.length - i - 1;
                     var neutralLosses = getNeutralLosses(container);
                     var sion = seriesData[idx];
-													for(var nl = 0; nl < neutralLosses.length; nl += 1) {
-													     var neutralLoss = neutralLosses[nl];
-				if(!neutralLoss.applies(sion)) {
-					continue;
-				}
+					for(var nl = 0; nl < neutralLosses.length; nl += 1) {
+					     var neutralLoss = neutralLosses[nl];
+						 if(!neutralLoss.applies(sion)) {
+							continue;
+						 }
 
-																 var ionLabel = matchLabel(sion, neutralLoss.label);
-																 var ionmz = ionMz(sion, neutralLoss.label);
-																 allIons.push({"mz": ionmz, "label": ionLabel, matched: false});
+						 var ionLabel = matchLabel(sion, neutralLoss.label);
+						 var ionmz = ionMz(sion, neutralLoss.label);
+						 allIons.push({"mz": ionmz, "label": ionLabel, matched: false});
                     }
                 } 
             }
@@ -1135,18 +1135,20 @@
 
 			if(container.data("options").sequence) {
 
-                var sequence =  container.data("options").sequence
+                var sequence =  container.data("options").sequence;                
 				var massType = container.find("input[name='"+getRadioName(container, "massTypeOpt")+"']:checked").val();
 				
-				for(var i = 1; i < sequence.length; i += 1) {
-					
-					for(var j = 0; j < todoIonSeries.length; j += 1) {
-						var tion = todoIonSeries[j];
-						var ionSeriesData = todoIonSeriesData[j];
-						if(tion.term == "n")
-							ionSeriesData.push(sion = Ion.getSeriesIon(tion, container.data("options").peptide, i, massType));
-						else if(tion.term == "c")
-							ionSeriesData.unshift(sion = Ion.getSeriesIon(tion, container.data("options").peptide, i, massType));
+				if(sequence.length){
+					for(var i = 1; i < sequence.length; i += 1) {
+						
+						for(var j = 0; j < todoIonSeries.length; j += 1) {
+							var tion = todoIonSeries[j];
+							var ionSeriesData = todoIonSeriesData[j];
+							if(tion.term == "n")
+								ionSeriesData.push(sion = Ion.getSeriesIon(tion, container.data("options").peptide, i, massType));
+							else if(tion.term == "c")
+								ionSeriesData.unshift(sion = Ion.getSeriesIon(tion, container.data("options").peptide, i, massType));
+						}
 					}
 				}
 

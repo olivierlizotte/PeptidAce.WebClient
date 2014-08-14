@@ -26,15 +26,16 @@
 <%
 	String[] tools = {};
 	String dbName = session.getAttribute("database").toString();
+	String idNode = session.getAttribute("id").toString();
 // 	try
 // 	{				
 	try{
 		Transaction tr = DefaultTemplate.graphDb(dbName).beginTx();
 		if (request.getParameter("name").equals("charts")){
-			tools = DefaultTemplate.getChartsTools(request.getParameter("id"), dbName);
+			tools = DefaultTemplate.getChartsTools(idNode, dbName);
 		}
 		if(request.getParameter("name").equals("seq")){
-			tools = DefaultTemplate.getNodeSpecificTools(request.getParameter("id"), dbName);
+			tools = DefaultTemplate.getNodeSpecificTools(idNode, dbName);
 		}
 		tr.success();
 		tr.close();
@@ -46,7 +47,7 @@
 	for(String path : tools)
 	{
 		String newDesc = path + "/Description.txt";
-		String newLaunch = path + "/Launcher.jsp";
+		String newLaunch = path + "/Launcher.jsp?id=" + idNode + "&db=" + dbName;
 		%>
 		<button onClick="gotoUrl('<%= newLaunch %>')"> 
 		<jsp:include page="<%= newDesc %>"/>

@@ -781,8 +781,12 @@ function OnNodeClick(node)
     function DisplaySpectrum(spectrum, arrayOfParam) {
 
     	$("#spectrum").empty();
+    	var paramSequence = "";    	
+    	if(arrayOfParam && arrayOfParam.length && arrayOfParam.length > 0)
+    		paramSequence = arrayOfParam[0];
+        
         // render the spectrum with the given options 
-        $("#spectrum").specview({ sequence: arrayOfParam[0],
+        $("#spectrum").specview({ sequence: paramSequence,
             scanNum: spectrum.ScanNumber,
             charge: spectrum.PrecursorCharge,
             precursorMz: spectrum.PrecursorMZ,
@@ -793,6 +797,7 @@ function OnNodeClick(node)
             ctermMod: arrayOfParam[4],
             peaks: spectrum.Peaks
         });
+
 
         OpenWindow("spectrum");
     }//*/

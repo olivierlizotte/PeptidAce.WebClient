@@ -59,11 +59,10 @@ public class DefaultNode
 	public void printGridDataJSON(JspWriter out) {
 		try 
 		{
-			String output = "var gridColumns = new Object();\n";
-			output += "var gridFields = new Object();\n";
-			output += "var gridSorters = new Object();\n";
-			output += "var gridName = new Object();\n";
-			out.print(output);
+			out.print("var gridColumns = new Object();\n");
+			out.print("var gridFields = new Object();\n");
+			out.print("var gridSorters = new Object();\n");
+			out.print("var gridName = new Object();\n");
 			computeGrid(NodeHelper.computeListOfAttributes( theNode ), theNode, out);
 		} catch (IOException e) {
 			e.printStackTrace();
